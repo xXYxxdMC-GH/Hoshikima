@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "randomthing:item/ender_pearl_bundle"
+  }
+}
