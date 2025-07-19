@@ -1,3 +1,9 @@
 {
-  "item.randomthing.ender_pearl_bundle": "Ender Pearl Bundle"
+  "item.randomthing.ender_pearl_bundle": "Ender Pearl Bundle",
+  "enchantment.randomthing.ender_escape": "Ender Escape",
+  "item.randomthing.firework_thruster": "Firework Thruster",
+  "tooltip.randomthing.count": "Ender Pearl Count",
+  "tooltip.randomthing.fuel": "Fuel Count",
+  "tooltip.randomthing.power": "Power",
+  "tooltip.randomthing.missing_paper": "Missing Paper"
 }

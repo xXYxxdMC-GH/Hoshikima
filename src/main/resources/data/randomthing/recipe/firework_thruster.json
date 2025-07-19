@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "GCG",
+        "BBB",
+        "FCF"
+    ],
+    "key": {
+        "G": "minecraft:gunpowder",
+        "B": "minecraft:bundle",
+        "F": "minecraft:firework_rocket",
+        "C": "minecraft:chest"
+    },
+    "result": {
+        "id": "randomthing:firework_thruster",
+        "components": {
+            "randomthing:fuel": 0,
+            "randomthing:power": 1,
+            "randomthing:missing_paper": true
+        },
+        "count": 1
+    }
+}

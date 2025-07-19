@@ -12,6 +12,7 @@ import java.util.function.Function;
 
 public class ModItem {
     public static final Item ENDER_PEARL_BUNDLE = register("ender_pearl_bundle", EnderPearlBundle::new, new Item.Settings());
+    public static final Item FIREWORK_THRUSTER = register("firework_thruster", FireworkThruster::new, new Item.Settings());
     public static Item register(String name, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {
         RegistryKey<Item> itemKey = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(RandomThing.MOD_ID, name));
         Item item = itemFactory.apply(settings.registryKey(itemKey));

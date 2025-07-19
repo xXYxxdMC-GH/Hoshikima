@@ -15,7 +15,7 @@
     "result": {
         "id": "randomthing:ender_pearl_bundle",
         "components": {
-            "damage": 16383
+            "randomthing:ender_pearl_count": 0
         },
         "count": 1
     }

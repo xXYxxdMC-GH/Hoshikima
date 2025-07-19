@@ -3,8 +3,8 @@
 	"package": "com.xxyxxdmc.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin",
-		"ItemEntityMixin"
+		"ItemEntityMixin",
+		"FireworkAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1
