@@ -179,8 +179,10 @@ public class LargeBucket extends Item {
         Block block = blockState.getBlock();
 
         if (block == fluid.getDefaultState().getBlockState().getBlock()) {
-            playEmptyingSound(player, world, pos, fluid);
-            return true;
+            if (world.setBlockState(pos, fluid.getDefaultState().getBlockState(), 11)) {
+                playEmptyingSound(player, world, pos, fluid);
+                return true;
+            }
         }
 
         if (block instanceof FluidFillable fluidFillable && fluidFillable.canFillWithFluid(player, world, pos, blockState, fluid)) {
