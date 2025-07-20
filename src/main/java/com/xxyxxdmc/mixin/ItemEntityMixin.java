@@ -1,6 +1,6 @@
 package com.xxyxxdmc.mixin;
 
-import com.xxyxxdmc.init.ItemPickupCallback;
+import com.xxyxxdmc.init.callback.ItemPickupCallback;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;

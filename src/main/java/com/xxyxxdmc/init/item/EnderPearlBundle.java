@@ -1,5 +1,6 @@
-package com.xxyxxdmc.init;
+package com.xxyxxdmc.init.item;
 
+import com.xxyxxdmc.init.entity.SpecialEnderPearlEntity;
 import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;

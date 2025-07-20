@@ -2,8 +2,16 @@
   "item.randomthing.ender_pearl_bundle": "Ender Pearl Bundle",
   "enchantment.randomthing.ender_escape": "Ender Escape",
   "item.randomthing.firework_thruster": "Firework Thruster",
+  "item.randomthing.large_bucket": "Large Bucket",
   "tooltip.randomthing.count": "Ender Pearl Count",
   "tooltip.randomthing.fuel": "Fuel Count",
   "tooltip.randomthing.power": "Power",
-  "tooltip.randomthing.missing_paper": "Missing Paper"
+  "tooltip.randomthing.missing_paper": "Missing Paper",
+  "tooltip.randomthing.empty": "Empty",
+  "tooltip.randomthing.capacity": "Capacity",
+  "tooltip.randomthing.lava": "Lava",
+  "tooltip.randomthing.water": "Water",
+  "tooltip.randomthing.mode": "Mode",
+  "tooltip.randomthing.load": "Load",
+  "tooltip.randomthing.unload": "Unload"
 }

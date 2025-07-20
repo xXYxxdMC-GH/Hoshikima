@@ -1,0 +1,167 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "component",
+    "component": "randomthing:fluid_type",
+    "cases": [
+      {
+        "when": 1,
+        "model": {
+          "type": "minecraft:select",
+          "property": "component",
+          "component": "randomthing:water_capacity",
+          "cases": [
+            {
+              "when": 8,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_water_full"
+              }
+            },
+            {
+              "when": 7,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_water"
+              }
+            },
+            {
+              "when": 6,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_water"
+              }
+            },
+            {
+              "when": 5,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_water_will_full"
+              }
+            },
+            {
+              "when": 4,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_water_will_full"
+              }
+            },
+            {
+              "when": 3,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_water_half"
+              }
+            },
+            {
+              "when": 2,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_water_few"
+              }
+            },
+            {
+              "when": 1,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_water_few"
+              }
+            },
+            {
+              "when": 0,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "randomthing:item/large_bucket"
+          }
+        }
+      },
+      {
+        "when": 2,
+        "model": {
+          "type": "minecraft:select",
+          "property": "component",
+          "component": "randomthing:lava_capacity",
+          "cases": [
+            {
+              "when": 8,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_lava_full"
+              }
+            },
+            {
+              "when": 7,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_lava"
+              }
+            },
+            {
+              "when": 6,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_lava"
+              }
+            },
+            {
+              "when": 5,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_lava_will_full"
+              }
+            },
+            {
+              "when": 4,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_lava_will_full"
+              }
+            },
+            {
+              "when": 3,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_lava_half"
+              }
+            },
+            {
+              "when": 2,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_lava_few"
+              }
+            },
+            {
+              "when": 1,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket_lava_few"
+              }
+            },
+            {
+              "when": 0,
+              "model": {
+                "type": "minecraft:model",
+                "model": "randomthing:item/large_bucket"
+              }
+            }
+          ],
+          "fallback": {
+            "type": "minecraft:model",
+            "model": "randomthing:item/large_bucket_lava"
+          }
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "randomthing:item/large_bucket"
+    }
+  }
+}

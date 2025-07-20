@@ -1,6 +1,6 @@
 package com.xxyxxdmc;
 
-import com.xxyxxdmc.init.ItemPickupCallback;
+import com.xxyxxdmc.init.callback.ItemPickupCallback;
 import com.xxyxxdmc.init.ModDataComponents;
 import com.xxyxxdmc.init.ModItem;
 import net.fabricmc.api.ModInitializer;

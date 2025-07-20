@@ -1,5 +1,6 @@
-package com.xxyxxdmc.init;
+package com.xxyxxdmc.init.item;
 
+import com.xxyxxdmc.init.ModDataComponents;
 import com.xxyxxdmc.mixin.FireworkAccessor;
 import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,10 +20,8 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Shadow;
 
 import java.awt.*;
 import java.util.function.Consumer;

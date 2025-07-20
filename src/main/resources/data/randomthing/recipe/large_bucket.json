@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "B B",
+        "BBB",
+        "BBB"
+    ],
+    "key": {
+        "B": "minecraft:bundle"
+    },
+    "result": {
+        "id": "randomthing:firework_thruster",
+        "components": {
+            "randomthing:fluid_type": 0,
+            "randomthing:water_capacity": 0,
+            "randomthing:lava_capacity": 0
+        },
+        "count": 1
+    }
+}

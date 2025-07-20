@@ -1,4 +1,4 @@
-package com.xxyxxdmc.init;
+package com.xxyxxdmc.init.entity;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.*;

@@ -1,4 +1,4 @@
-package com.xxyxxdmc.init;
+package com.xxyxxdmc.init.callback;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
