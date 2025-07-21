@@ -49,6 +49,8 @@ public class FireworkThruster extends Item {
             if (power + 1 > 5) power = 1;
             else power++;
             itemStack.set(POWER, power);
+            user.playSound(SoundEvents.ITEM_BUNDLE_INSERT, 1.0F, 1.0F);
+            user.sendMessage(Text.translatable("tooltip.randomthing.power").append(": ").append(Text.literal(String.valueOf(power))), true);
             return ActionResult.SUCCESS;
         } else if (user.isGliding()) {
             int currentFuel = itemStack.getOrDefault(FUEL, 0);

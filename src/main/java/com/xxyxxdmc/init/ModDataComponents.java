@@ -65,6 +65,14 @@ public class ModDataComponents {
                     .packetCodec(PacketCodecs.VAR_INT)
                     .build()
     );
+    public static final ComponentType<Integer> SNOW_CAPACITY = Registry.register(
+            Registries.DATA_COMPONENT_TYPE,
+            Identifier.of(RandomThing.MOD_ID, "snow_capacity"),
+            ComponentType.<Integer>builder()
+                    .codec(Codec.INT)
+                    .packetCodec(PacketCodecs.VAR_INT)
+                    .build()
+    );
     public static final ComponentType<Integer> MODE = Registry.register(
             Registries.DATA_COMPONENT_TYPE,
             Identifier.of(RandomThing.MOD_ID, "mode"),
