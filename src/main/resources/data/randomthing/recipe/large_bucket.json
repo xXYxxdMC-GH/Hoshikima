@@ -6,10 +6,10 @@
         "BBB"
     ],
     "key": {
-        "B": "minecraft:bundle"
+        "B": "minecraft:bucket"
     },
     "result": {
-        "id": "randomthing:firework_thruster",
+        "id": "randomthing:large_bucket",
         "components": {
             "randomthing:fluid_type": 0,
             "randomthing:water_capacity": 0,
