@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "BGB",
+    "RBR"
+  ],
+  "key": {
+    "B": "minecraft:bucket",
+    "R": "minecraft:redstone",
+    "S": "minecraft:sticky_piston",
+    "G": "minecraft:glass"
+  },
+  "result": {
+    "id": "randomthing:multi_fluid_bucket",
+    "components": {
+      "randomthing:fill_type": 0,
+      "randomthing:mode": 1
+    },
+    "count": 1
+  }
+}

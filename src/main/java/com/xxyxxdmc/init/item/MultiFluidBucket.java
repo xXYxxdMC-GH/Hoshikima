@@ -46,7 +46,6 @@ public class MultiFluidBucket extends Item {
     @Override
     public ActionResult use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
-
         if (user.isSneaking()) {
             int mode = stack.getOrDefault(MODE, 1);
             // Mode 1 is that water, 2 is lava, 3 is powder snow, 4 is spare
@@ -469,11 +468,17 @@ public class MultiFluidBucket extends Item {
                 .append(": ")
                 .append(Text.translatable("tooltip.randomthing." + (mode == 1 ? "water" :
                         (mode == 2 ? "lava" : (mode == 3 ? "powder_snow" : "spare"))))
-                .withColor((mode == 1 ? new Color(0, 116, 216).getRGB() : (mode == 2 ? new Color(221, 76, 0).getRGB() : (mode == 3 ? new Color(255, 255, 255).getRGB() : spare == 0 ?
-                        new Color(168, 168, 168).getRGB() : spare == 1 ?
-                        new Color(0, 116, 216).getRGB() : spare == 2 ?
-                        new Color(221, 76, 0).getRGB() :
-                        new Color(255, 255, 255).getRGB()))))
+                        .withColor((mode == 1 ? new Color(0, 116, 216).getRGB() :
+                                (mode == 2 ? new Color(221, 76, 0).getRGB() :
+                                        (mode == 3 ? new Color(255, 255, 255).getRGB() :
+                                                new Color(168, 168, 168).getRGB()))))
+                        .append((mode != 4) ? "" : "(")
+                        .append((mode != 4) ? Text.empty() : (spare == 0) ?
+                                Text.translatable("tooltip.randomthing.empty").formatted(Formatting.GRAY) : spare == 1 ?
+                                Text.translatable("tooltip.randomthing.water").withColor(new Color(0, 116, 216).getRGB()) : spare == 2 ?
+                                Text.translatable("tooltip.randomthing.lava").withColor(new Color(221, 76, 0).getRGB()) :
+                                Text.translatable("tooltip.randomthing.powder_snow"))
+                        .append((mode != 4) ? "" : ")")
                 )
         );
     }
