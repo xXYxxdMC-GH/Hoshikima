@@ -1,9 +1,7 @@
 {
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
-    {
-      "item": "randomthing:ender_pearl_bundle"
-    }
+      "randomthing:ender_pearl_bundle"
   ],
   "result": {
     "id": "randomthing:ender_pearl_bundle",

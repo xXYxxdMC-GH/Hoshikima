@@ -1,8 +1,9 @@
 {
   "item.randomthing.ender_pearl_bundle": "Ender Pearl Bundle",
-  "enchantment.randomthing.ender_escape": "Ender Escape",
   "item.randomthing.firework_thruster": "Firework Thruster",
   "item.randomthing.large_bucket": "Large Bucket",
+  "item.randomthing.multi_fluid_bucket": "Multi Fluid Bucket",
+  "enchantment.randomthing.ender_escape": "Ender Escape",
   "tooltip.randomthing.count": "Ender Pearl Count",
   "tooltip.randomthing.fuel": "Fuel Count",
   "tooltip.randomthing.power": "Power",
@@ -14,5 +15,8 @@
   "tooltip.randomthing.powder_snow": "Powder Snow",
   "tooltip.randomthing.mode": "Mode",
   "tooltip.randomthing.load": "Load",
-  "tooltip.randomthing.unload": "Unload"
+  "tooltip.randomthing.unload": "Unload",
+  "tooltip.randomthing.chose": "Have been chose",
+  "tooltip.randomthing.spare": "Spare",
+  "tooltip.randomthing.state": "State"
 }
