@@ -53,11 +53,11 @@ public class LargeBucket extends Item {
             if (mode == 1) {
                 stack.set(MODE, 2);
                 user.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F, 1.2F);
-                user.sendMessage(Text.translatable("tooltip.randomthing.mode").append(": ").append(Text.translatable("tooltip.randomthing.unload")), true);
+                user.sendMessage(Text.translatable("tooltip.hoshikima.mode").append(": ").append(Text.translatable("tooltip.hoshikima.unload")), true);
             } else {
                 stack.set(MODE, 1);
                 user.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F, 0.8F);
-                user.sendMessage(Text.translatable("tooltip.randomthing.mode").append(": ").append(Text.translatable("tooltip.randomthing.load")), true);
+                user.sendMessage(Text.translatable("tooltip.hoshikima.mode").append(": ").append(Text.translatable("tooltip.hoshikima.load")), true);
             }
             return ActionResult.SUCCESS;
         }
@@ -376,17 +376,17 @@ public class LargeBucket extends Item {
         super.appendTooltip(stack, context, displayComponent, textConsumer, type);
         int currentFluid = stack.getOrDefault(FLUID_TYPE, 0);
         int mode = stack.getOrDefault(MODE, 1);
-        if (mode == 1) textConsumer.accept(Text.translatable("tooltip.randomthing.mode").append(Text.literal(": ").formatted(Formatting.GRAY)).append(Text.translatable("tooltip.randomthing.load").withColor(new Color(38, 153, 0).getRGB())).formatted(Formatting.GRAY));
-        else textConsumer.accept(Text.translatable("tooltip.randomthing.mode").append(Text.literal(": ").formatted(Formatting.GRAY)).append(Text.translatable("tooltip.randomthing.unload").withColor(new Color(180, 0, 0).getRGB())).formatted(Formatting.GRAY));
+        if (mode == 1) textConsumer.accept(Text.translatable("tooltip.hoshikima.mode").append(Text.literal(": ").formatted(Formatting.GRAY)).append(Text.translatable("tooltip.hoshikima.load").withColor(new Color(38, 153, 0).getRGB())).formatted(Formatting.GRAY));
+        else textConsumer.accept(Text.translatable("tooltip.hoshikima.mode").append(Text.literal(": ").formatted(Formatting.GRAY)).append(Text.translatable("tooltip.hoshikima.unload").withColor(new Color(180, 0, 0).getRGB())).formatted(Formatting.GRAY));
         if (currentFluid != 0) {
             int currentCapacity = stack.getOrDefault(currentFluid == 1 ? WATER_CAPACITY : currentFluid == 2 ? LAVA_CAPACITY : SNOW_CAPACITY, 0);
-            if (currentFluid == 1) textConsumer.accept(Text.translatable("tooltip.randomthing.water").withColor(new Color(0, 116, 216).getRGB()));
-            else if (currentFluid == 2) textConsumer.accept(Text.translatable("tooltip.randomthing.lava").withColor(new Color(221, 76, 0).getRGB()));
-            else textConsumer.accept(Text.translatable("tooltip.randomthing.powder_snow").withColor(new Color(255, 255, 255).getRGB()));
-            textConsumer.accept(Text.translatable("tooltip.randomthing.capacity")
+            if (currentFluid == 1) textConsumer.accept(Text.translatable("tooltip.hoshikima.water").withColor(new Color(0, 116, 216).getRGB()));
+            else if (currentFluid == 2) textConsumer.accept(Text.translatable("tooltip.hoshikima.lava").withColor(new Color(221, 76, 0).getRGB()));
+            else textConsumer.accept(Text.translatable("tooltip.hoshikima.powder_snow").withColor(new Color(255, 255, 255).getRGB()));
+            textConsumer.accept(Text.translatable("tooltip.hoshikima.capacity")
                     .append(Text.literal(": " + currentCapacity + " / " + maxCapacity))
                     .formatted(Formatting.GRAY));
-        } else textConsumer.accept(Text.translatable("tooltip.randomthing.empty")
+        } else textConsumer.accept(Text.translatable("tooltip.hoshikima.empty")
                 .formatted(Formatting.GRAY));
     }
 }

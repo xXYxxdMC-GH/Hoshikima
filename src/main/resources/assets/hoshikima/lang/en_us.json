@@ -1,0 +1,22 @@
+{
+  "item.hoshikima.ender_pearl_bundle": "Ender Pearl Bundle",
+  "item.hoshikima.firework_thruster": "Firework Thruster",
+  "item.hoshikima.large_bucket": "Large Bucket",
+  "item.hoshikima.multi_fluid_bucket": "Multi Fluid Bucket",
+  "enchantment.hoshikima.ender_escape": "Ender Escape",
+  "tooltip.hoshikima.count": "Ender Pearl Count",
+  "tooltip.hoshikima.fuel": "Fuel Count",
+  "tooltip.hoshikima.power": "Power",
+  "tooltip.hoshikima.missing_paper": "Missing Paper",
+  "tooltip.hoshikima.empty": "Empty",
+  "tooltip.hoshikima.capacity": "Capacity",
+  "tooltip.hoshikima.lava": "Lava",
+  "tooltip.hoshikima.water": "Water",
+  "tooltip.hoshikima.powder_snow": "Powder Snow",
+  "tooltip.hoshikima.mode": "Mode",
+  "tooltip.hoshikima.load": "Load",
+  "tooltip.hoshikima.unload": "Unload",
+  "tooltip.hoshikima.chose": "Have been chose",
+  "tooltip.hoshikima.spare": "Spare",
+  "tooltip.hoshikima.state": "State"
+}

@@ -97,7 +97,7 @@ public class EnderPearlBundle extends Item {
     public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
         super.appendTooltip(stack, context, displayComponent, textConsumer, type);
         int currentCount = getEnderPearlCount(stack);
-        textConsumer.accept(Text.translatable("tooltip.randomthing.count")
+        textConsumer.accept(Text.translatable("tooltip.hoshikima.count")
                 .append(Text.literal(": " + currentCount + " / " + this.maxCount))
                 .formatted(Formatting.GRAY));
     }

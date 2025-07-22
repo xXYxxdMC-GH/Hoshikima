@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " S ",
+    "BGB",
+    "RBR"
+  ],
+  "key": {
+    "B": "minecraft:bucket",
+    "R": "minecraft:redstone",
+    "S": "minecraft:sticky_piston",
+    "G": "minecraft:glass"
+  },
+  "result": {
+    "id": "hoshikima:multi_fluid_bucket",
+    "components": {
+      "hoshikima:fill_type": 0,
+      "hoshikima:mode": 1
+    },
+    "count": 1
+  }
+}

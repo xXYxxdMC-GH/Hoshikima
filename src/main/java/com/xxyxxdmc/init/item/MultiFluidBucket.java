@@ -52,30 +52,30 @@ public class MultiFluidBucket extends Item {
             if (mode == 1) {
                 stack.set(MODE, 2);
                 user.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F, 0.6F);
-                user.sendMessage(Text.translatable("tooltip.randomthing.chose").append(" ").append(Text.translatable("tooltip.randomthing.lava").withColor(new Color(221, 76, 0).getRGB())), true);
+                user.sendMessage(Text.translatable("tooltip.hoshikima.chose").append(" ").append(Text.translatable("tooltip.hoshikima.lava").withColor(new Color(221, 76, 0).getRGB())), true);
             } else if (mode == 2) {
                 stack.set(MODE, 3);
                 user.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F, 0.8F);
-                user.sendMessage(Text.translatable("tooltip.randomthing.chose").append(" ").append(Text.translatable("tooltip.randomthing.powder_snow").withColor(new Color(255, 255, 255).getRGB())), true);
+                user.sendMessage(Text.translatable("tooltip.hoshikima.chose").append(" ").append(Text.translatable("tooltip.hoshikima.powder_snow").withColor(new Color(255, 255, 255).getRGB())), true);
             } else if (mode == 3) {
                 stack.set(MODE, 4);
                 int spare = stack.getOrDefault(SPARE_CAPACITY, 0);
                 user.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F, 1.0F);
-                user.sendMessage(Text.translatable("tooltip.randomthing.chose")
+                user.sendMessage(Text.translatable("tooltip.hoshikima.chose")
                         .append(" ")
-                        .append(Text.translatable("tooltip.randomthing.spare"))
+                        .append(Text.translatable("tooltip.hoshikima.spare"))
                         .append("(")
                         .append(spare == 0 ?
-                                Text.translatable("tooltip.randomthing.empty").formatted(Formatting.GRAY) : spare == 1 ?
-                                Text.translatable("tooltip.randomthing.water").withColor(new Color(0, 116, 216).getRGB()) : spare == 2 ?
-                                Text.translatable("tooltip.randomthing.lava").withColor(new Color(221, 76, 0).getRGB()) :
-                                Text.translatable("tooltip.randomthing.powder_snow").withColor(new Color(255, 255, 255).getRGB()))
+                                Text.translatable("tooltip.hoshikima.empty").formatted(Formatting.GRAY) : spare == 1 ?
+                                Text.translatable("tooltip.hoshikima.water").withColor(new Color(0, 116, 216).getRGB()) : spare == 2 ?
+                                Text.translatable("tooltip.hoshikima.lava").withColor(new Color(221, 76, 0).getRGB()) :
+                                Text.translatable("tooltip.hoshikima.powder_snow").withColor(new Color(255, 255, 255).getRGB()))
                                 .append(")")
                         , true);
             } else {
                 stack.set(MODE, 1);
                 user.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1.0F, 1.2F);
-                user.sendMessage(Text.translatable("tooltip.randomthing.chose").append(" ").append(Text.translatable("tooltip.randomthing.water").withColor(new Color(0, 116, 216).getRGB())), true);
+                user.sendMessage(Text.translatable("tooltip.hoshikima.chose").append(" ").append(Text.translatable("tooltip.hoshikima.water").withColor(new Color(0, 116, 216).getRGB())), true);
             }
             return ActionResult.SUCCESS;
         }
@@ -448,21 +448,21 @@ public class MultiFluidBucket extends Item {
         int fillType = stack.getOrDefault(FILL_TYPE, 0);
         int mode = stack.getOrDefault(MODE, 1);
         int spare = stack.getOrDefault(SPARE_CAPACITY, 0);
-        textConsumer.accept(Text.translatable("tooltip.randomthing.state")
+        textConsumer.accept(Text.translatable("tooltip.hoshikima.state")
                 .append(": ")
-                .append(Text.translatable("tooltip.randomthing.water")
+                .append(Text.translatable("tooltip.hoshikima.water")
                         .withColor((fillType == 1 || fillType == 4 || fillType == 5 || fillType == 7) ?
                                 new Color(0, 116, 216).getRGB() : GRAY))
                 .append("/")
-                .append(Text.translatable("tooltip.randomthing.lava")
+                .append(Text.translatable("tooltip.hoshikima.lava")
                         .withColor((fillType == 2 || fillType == 4 || fillType == 6 || fillType == 7) ?
                                 new Color(221, 76, 0).getRGB() : GRAY))
                 .append("/")
-                .append(Text.translatable("tooltip.randomthing.powder_snow")
+                .append(Text.translatable("tooltip.hoshikima.powder_snow")
                         .withColor((fillType == 3 || fillType == 5 || fillType == 6 || fillType == 7) ?
                                 new Color(255, 255, 255).getRGB() : GRAY))
                 .append("/")
-                .append(Text.translatable("tooltip.randomthing.spare")
+                .append(Text.translatable("tooltip.hoshikima.spare")
                         .withColor(spare == 0 ?
                                 new Color(168, 168, 168).getRGB() : spare == 1 ?
                                 new Color(0, 116, 216).getRGB() : spare == 2 ?
@@ -470,9 +470,9 @@ public class MultiFluidBucket extends Item {
                                 new Color(255, 255, 255).getRGB())
                 )
         );
-        textConsumer.accept(Text.translatable("tooltip.randomthing.mode")
+        textConsumer.accept(Text.translatable("tooltip.hoshikima.mode")
                 .append(": ")
-                .append(Text.translatable("tooltip.randomthing." + (mode == 1 ? "water" :
+                .append(Text.translatable("tooltip.hoshikima." + (mode == 1 ? "water" :
                         (mode == 2 ? "lava" : (mode == 3 ? "powder_snow" : "spare"))))
                         .withColor((mode == 1 ? new Color(0, 116, 216).getRGB() :
                                 (mode == 2 ? new Color(221, 76, 0).getRGB() :
@@ -480,10 +480,10 @@ public class MultiFluidBucket extends Item {
                                                 new Color(168, 168, 168).getRGB()))))
                         .append((mode != 4) ? "" : "(")
                         .append((mode != 4) ? Text.empty() : (spare == 0) ?
-                                Text.translatable("tooltip.randomthing.empty").formatted(Formatting.GRAY) : spare == 1 ?
-                                Text.translatable("tooltip.randomthing.water").withColor(new Color(0, 116, 216).getRGB()) : spare == 2 ?
-                                Text.translatable("tooltip.randomthing.lava").withColor(new Color(221, 76, 0).getRGB()) :
-                                Text.translatable("tooltip.randomthing.powder_snow"))
+                                Text.translatable("tooltip.hoshikima.empty").formatted(Formatting.GRAY) : spare == 1 ?
+                                Text.translatable("tooltip.hoshikima.water").withColor(new Color(0, 116, 216).getRGB()) : spare == 2 ?
+                                Text.translatable("tooltip.hoshikima.lava").withColor(new Color(221, 76, 0).getRGB()) :
+                                Text.translatable("tooltip.hoshikima.powder_snow"))
                         .append((mode != 4) ? "" : ")")
                 )
         );

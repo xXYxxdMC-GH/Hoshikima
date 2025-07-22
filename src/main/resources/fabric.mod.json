@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "randomthing",
+	"id": "hoshikima",
 	"version": "${version}",
-	"name": "RandomThing",
+	"name": "Hoshikima",
 	"description": "This is a simple mod which add some useful things.",
 	"authors": [
 		"xXYxxdMC"
@@ -12,20 +12,20 @@
 		"sources": "https://github.com/FabricMC/fabric-example-mod"
 	},
 	"license": "CC0-1.0",
-	"icon": "assets/randomthing/icon.png",
+	"icon": "assets/hoshikima/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.xxyxxdmc.RandomThing"
+			"com.xxyxxdmc.Hoshikima"
 		],
 		"client": [
 			"com.xxyxxdmc.RandomThingClient"
 		]
 	},
 	"mixins": [
-		"randomthing.mixins.json",
+		"hoshikima.mixins.json",
 		{
-			"config": "randomthing.client.mixins.json",
+			"config": "hoshikima.client.mixins.json",
 			"environment": "client"
 		}
 	],

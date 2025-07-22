@@ -1,0 +1,57 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "hoshikima:item/firework_thruster"
+      },
+      {
+        "type": "minecraft:select",
+        "property": "component",
+        "component": "hoshikima:power",
+        "cases": [
+          {
+            "when": 1,
+            "model": {
+              "type": "minecraft:model",
+              "model": "hoshikima:item/power1"
+            }
+          },
+          {
+            "when": 2,
+            "model": {
+              "type": "minecraft:model",
+              "model": "hoshikima:item/power2"
+            }
+          },
+          {
+            "when": 3,
+            "model": {
+              "type": "minecraft:model",
+              "model": "hoshikima:item/power3"
+            }
+          },
+          {
+            "when": 4,
+            "model": {
+              "type": "minecraft:model",
+              "model": "hoshikima:item/power4"
+            }
+          },
+          {
+            "when": 5,
+            "model": {
+              "type": "minecraft:model",
+              "model": "hoshikima:item/power5"
+            }
+          }
+        ],
+        "fallback": {
+          "type": "minecraft:model",
+          "model": "hoshikima:item/blank"
+        }
+      }
+    ]
+  }
+}

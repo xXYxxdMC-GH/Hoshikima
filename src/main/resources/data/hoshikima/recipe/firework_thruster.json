@@ -1,0 +1,23 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "GCG",
+        "BBB",
+        "FCF"
+    ],
+    "key": {
+        "G": "minecraft:gunpowder",
+        "B": "minecraft:bundle",
+        "F": "minecraft:firework_rocket",
+        "C": "minecraft:chest"
+    },
+    "result": {
+        "id": "hoshikima:firework_thruster",
+        "components": {
+            "hoshikima:fuel": 0,
+            "hoshikima:power": 1,
+            "hoshikima:missing_paper": true
+        },
+        "count": 1
+    }
+}

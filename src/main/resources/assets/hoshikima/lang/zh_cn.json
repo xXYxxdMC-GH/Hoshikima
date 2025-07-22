@@ -1,0 +1,22 @@
+{
+  "item.hoshikima.ender_pearl_bundle": "末影珍珠袋",
+  "item.hoshikima.firework_thruster": "烟花推进器",
+  "item.hoshikima.large_bucket": "大桶",
+  "item.hoshikima.multi_fluid_bucket": "多流体桶",
+  "enchantment.hoshikima.ender_escape": "末影逃逸",
+  "tooltip.hoshikima.count": "末影珍珠数量",
+  "tooltip.hoshikima.fuel": "燃料",
+  "tooltip.hoshikima.power": "功率",
+  "tooltip.hoshikima.missing_paper": "缺纸",
+  "tooltip.hoshikima.empty": "空",
+  "tooltip.hoshikima.capacity": "容量",
+  "tooltip.hoshikima.lava": "熔岩",
+  "tooltip.hoshikima.water": "水",
+  "tooltip.hoshikima.powder_snow": "细雪",
+  "tooltip.hoshikima.mode": "模式",
+  "tooltip.hoshikima.load": "装填",
+  "tooltip.hoshikima.unload": "倾倒",
+  "tooltip.hoshikima.chose": "已选择",
+  "tooltip.hoshikima.spare": "备用",
+  "tooltip.hoshikima.state": "状态"
+}

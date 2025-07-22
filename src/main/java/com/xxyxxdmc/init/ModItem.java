@@ -1,6 +1,6 @@
 package com.xxyxxdmc.init;
 
-import com.xxyxxdmc.RandomThing;
+import com.xxyxxdmc.Hoshikima;
 import com.xxyxxdmc.init.item.EnderPearlBundle;
 import com.xxyxxdmc.init.item.FireworkThruster;
 import com.xxyxxdmc.init.item.LargeBucket;
@@ -20,7 +20,7 @@ public class ModItem {
     public static final Item LARGE_BUCKET = register("large_bucket", LargeBucket::new, new Item.Settings());
     public static final Item MULTI_FLUID_BUCKET = register("multi_fluid_bucket", MultiFluidBucket::new, new Item.Settings());
     public static Item register(String name, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {
-        RegistryKey<Item> itemKey = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(RandomThing.MOD_ID, name));
+        RegistryKey<Item> itemKey = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Hoshikima.MOD_ID, name));
         Item item = itemFactory.apply(settings.registryKey(itemKey));
         Registry.register(Registries.ITEM, itemKey, item);
         return item;

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+      "hoshikima:ender_pearl_bundle"
+  ],
+  "result": {
+    "id": "hoshikima:ender_pearl_bundle",
+    "components": {
+      "hoshikima:ender_pearl_count": 0
+    },
+    "count": 1
+  }
+}

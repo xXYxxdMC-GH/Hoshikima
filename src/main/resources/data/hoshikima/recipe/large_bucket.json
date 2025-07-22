@@ -1,0 +1,20 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "B B",
+        "BBB",
+        "BBB"
+    ],
+    "key": {
+        "B": "minecraft:bucket"
+    },
+    "result": {
+        "id": "hoshikima:large_bucket",
+        "components": {
+            "hoshikima:fluid_type": 0,
+            "hoshikima:water_capacity": 0,
+            "hoshikima:lava_capacity": 0
+        },
+        "count": 1
+    }
+}

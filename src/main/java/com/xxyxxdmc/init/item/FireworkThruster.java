@@ -50,7 +50,7 @@ public class FireworkThruster extends Item {
             else power++;
             itemStack.set(POWER, power);
             user.playSound(SoundEvents.ITEM_BUNDLE_INSERT, 1.0F, 1.0F);
-            user.sendMessage(Text.translatable("tooltip.randomthing.power").append(": ").append(Text.literal(String.valueOf(power))), true);
+            user.sendMessage(Text.translatable("tooltip.hoshikima.power").append(": ").append(Text.literal(String.valueOf(power))), true);
             return ActionResult.SUCCESS;
         } else if (user.isGliding()) {
             int currentFuel = itemStack.getOrDefault(FUEL, 0);
@@ -127,14 +127,14 @@ public class FireworkThruster extends Item {
         boolean missingPaper = stack.getOrDefault(MISSING_PAPER, true);
 
         if (!missingPaper) {
-            textConsumer.accept(Text.translatable("tooltip.randomthing.fuel")
+            textConsumer.accept(Text.translatable("tooltip.hoshikima.fuel")
                     .append(Text.literal(": " + currentFuel + " / " + this.maxFuel))
                     .formatted(Formatting.GRAY));
 
-            textConsumer.accept(Text.translatable("tooltip.randomthing.power")
+            textConsumer.accept(Text.translatable("tooltip.hoshikima.power")
                     .append(Text.literal(": " + power))
                     .formatted(Formatting.GRAY));
-        } else textConsumer.accept(Text.translatable("tooltip.randomthing.missing_paper")
+        } else textConsumer.accept(Text.translatable("tooltip.hoshikima.missing_paper")
                 .formatted(Formatting.RED));
 
         super.appendTooltip(stack, context, displayComponent, textConsumer, type);
