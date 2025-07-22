@@ -2,10 +2,10 @@
 	"schemaVersion": 1,
 	"id": "randomthing",
 	"version": "${version}",
-	"name": "randomthing",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "RandomThing",
+	"description": "This is a simple mod which add some useful things.",
 	"authors": [
-		"Me!"
+		"xXYxxdMC"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
