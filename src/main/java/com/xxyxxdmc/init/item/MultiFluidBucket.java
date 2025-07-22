@@ -148,6 +148,8 @@ public class MultiFluidBucket extends Item {
         }
         BlockPos pos = hitResult.getBlockPos();
         BlockState blockState = world.getBlockState(pos);
+        FluidState fluidState = world.getFluidState(pos);
+        Fluid fluidToPickup = fluidState.getFluid();
         int fillType = stack.getOrDefault(FILL_TYPE, 0);
         int mode = stack.getOrDefault(MODE, 1);
         int spare = stack.getOrDefault(SPARE_CAPACITY, 0);
@@ -164,6 +166,7 @@ public class MultiFluidBucket extends Item {
             return ActionResult.SUCCESS;
         }
 
+        if (!fluidToPickup.matchesType(Fluids.WATER)) return ActionResult.PASS;
         if (blockState.getBlock() instanceof FluidDrainable drainable) {
             ItemStack drainedStack = drainable.tryDrainFluid(player, world, pos, blockState);
             if (!drainedStack.isEmpty()) {
@@ -185,6 +188,8 @@ public class MultiFluidBucket extends Item {
         }
         BlockPos pos = hitResult.getBlockPos();
         BlockState blockState = world.getBlockState(pos);
+        FluidState fluidState = world.getFluidState(pos);
+        Fluid fluidToPickup = fluidState.getFluid();
         int fillType = stack.getOrDefault(FILL_TYPE, 0);
         int mode = stack.getOrDefault(MODE, 1);
         int spare = stack.getOrDefault(SPARE_CAPACITY, 0);
@@ -201,6 +206,7 @@ public class MultiFluidBucket extends Item {
             return ActionResult.SUCCESS;
         }
 
+        if (!fluidToPickup.matchesType(Fluids.LAVA)) return ActionResult.PASS;
         if (blockState.getBlock() instanceof FluidDrainable drainable) {
             ItemStack drainedStack = drainable.tryDrainFluid(player, world, pos, blockState);
             if (!drainedStack.isEmpty()) {
