@@ -3,7 +3,7 @@
 	"package": "com.xxyxxdmc.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"ExampleClientMixin"
+		"HoshikimaClientMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

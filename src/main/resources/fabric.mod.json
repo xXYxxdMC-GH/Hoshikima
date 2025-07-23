@@ -19,7 +19,7 @@
 			"com.xxyxxdmc.Hoshikima"
 		],
 		"client": [
-			"com.xxyxxdmc.RandomThingClient"
+			"com.xxyxxdmc.HoshikimaClient"
 		]
 	},
 	"mixins": [
