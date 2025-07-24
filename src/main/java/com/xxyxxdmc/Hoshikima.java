@@ -1,8 +1,9 @@
 package com.xxyxxdmc;
 
-import com.xxyxxdmc.init.callback.ItemPickupCallback;
 import com.xxyxxdmc.init.ModDataComponents;
+import com.xxyxxdmc.init.ModEnchantments;
 import com.xxyxxdmc.init.ModItem;
+import com.xxyxxdmc.init.callback.ItemPickupCallback;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -49,6 +50,7 @@ public class Hoshikima implements ModInitializer {
 			}
 		});
 		ModDataComponents.register();
+		ModEnchantments.registerModEnchantmentEffects();
 	}
 	private void tryAbsorbPearls(ItemStack remainingStack, ItemStack bundleStack) {
 		if (remainingStack.isEmpty() || bundleStack.getItem() != ModItem.ENDER_PEARL_BUNDLE) {

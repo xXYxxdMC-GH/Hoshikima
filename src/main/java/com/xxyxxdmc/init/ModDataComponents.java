@@ -8,6 +8,8 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
+import java.util.List;
+
 public class ModDataComponents {
     public static final ComponentType<Integer> FUEL = Registry.register(
             Registries.DATA_COMPONENT_TYPE,
@@ -95,6 +97,14 @@ public class ModDataComponents {
             ComponentType.<Integer>builder()
                     .codec(Codec.INT)
                     .packetCodec(PacketCodecs.VAR_INT)
+                    .build()
+    );
+    public static final ComponentType<List<String>> ENTITIES_IN_BUCKET = Registry.register(
+            Registries.DATA_COMPONENT_TYPE,
+            Identifier.of(Hoshikima.MOD_ID, "entities_in_bucket"),
+            ComponentType.<List<String>>builder()
+                    .codec(Codec.list(Codec.STRING))
+                    .packetCodec(PacketCodecs.codec(Codec.list(Codec.STRING)))
                     .build()
     );
 

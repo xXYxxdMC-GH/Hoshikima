@@ -20,6 +20,9 @@
 		],
 		"client": [
 			"com.xxyxxdmc.HoshikimaClient"
+		],
+		"fabric-datagen": [
+			"com.xxyxxdmc.docs.datagen.FabricDocsReferenceDataGenerator"
 		]
 	},
 	"mixins": [
@@ -37,8 +40,5 @@
 	},
 	"suggests": {
 		"another-mod": "*"
-	},
-	"fabric-datagen": [
-		"com.xxyxxdmc.docs.datagen.FabricDocsReferenceDataGenerator"
-	]
+	}
 }

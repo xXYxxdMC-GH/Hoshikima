@@ -4,8 +4,12 @@ import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
 import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.*;
-import net.minecraft.item.*;
+import net.minecraft.fluid.FlowableFluid;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
@@ -28,6 +32,7 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
 import static com.xxyxxdmc.init.ModDataComponents.*;
@@ -36,7 +41,7 @@ public class LargeBucket extends Item {
     private final int maxCapacity = 8;
 
     public LargeBucket(Settings settings) {
-        super(settings.maxCount(1).component(FLUID_TYPE, 0).component(WATER_CAPACITY, 0).component(LAVA_CAPACITY, 0).component(SNOW_CAPACITY, 0).component(MODE, 1));
+        super(settings.maxCount(1).component(FLUID_TYPE, 0).component(WATER_CAPACITY, 0).component(LAVA_CAPACITY, 0).component(SNOW_CAPACITY, 0).component(MODE, 1).component(ENTITIES_IN_BUCKET, new ArrayList<>()));
     }
 
     @Override
