@@ -9,4 +9,7 @@ public class LargeBucketEcoSystem {
     public static List<NbtCompound> processEntitiesRelationship(List<NbtCompound> entities) {
         return null;
     }
+    public static void attack(NbtCompound attacker, NbtCompound victim, int amount) {
+
+    }
 }

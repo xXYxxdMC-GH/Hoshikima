@@ -18,5 +18,7 @@
   "tooltip.hoshikima.unload": "倾倒",
   "tooltip.hoshikima.chose": "已选择",
   "tooltip.hoshikima.spare": "备用",
-  "tooltip.hoshikima.state": "状态"
+  "tooltip.hoshikima.state": "状态",
+  "tooltip.hoshikima.entity": "总共有 %d 个实体",
+  "tooltip.hoshikima.detail": "(按 SHIFT 键查看详情)"
 }
