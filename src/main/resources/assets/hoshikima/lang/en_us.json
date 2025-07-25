@@ -18,5 +18,7 @@
   "tooltip.hoshikima.unload": "Unload",
   "tooltip.hoshikima.chose": "Have been chose",
   "tooltip.hoshikima.spare": "Spare",
-  "tooltip.hoshikima.state": "State"
+  "tooltip.hoshikima.state": "State",
+  "tooltip.hoshikima.entity": "Have %d entities in total",
+  "tooltip.hoshikima.detail": "(Press SHIFT to see details)"
 }

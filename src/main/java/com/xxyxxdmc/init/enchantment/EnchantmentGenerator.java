@@ -27,7 +27,7 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
                                         registries.getOrThrow(RegistryKeys.ITEM).getOrThrow(TagKey.of(RegistryKeys.ITEM, Identifier.of(Hoshikima.MOD_ID, "enchantable/ender_pearl_bundle"))),
                                         5,
                                         1,
-                                        Enchantment.leveledCost(5, 0),
+                                        Enchantment.leveledCost(10, 0),
                                         Enchantment.leveledCost(50, 0),
                                         2,
                                         AttributeModifierSlot.ANY

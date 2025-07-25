@@ -1,8 +1,14 @@
 package com.xxyxxdmc.init.item;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
 import net.minecraft.component.type.TooltipDisplayComponent;
+import net.minecraft.entity.Bucketable;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
@@ -11,6 +17,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.tooltip.TooltipType;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -20,7 +27,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -33,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static com.xxyxxdmc.init.ModDataComponents.*;
@@ -282,7 +289,7 @@ public class LargeBucket extends Item {
 
         BlockPos finalPos = blockState.getBlock() instanceof FluidFillable ? posToPlace : posToPlace.offset(hitResult.getSide());
 
-        if (this.placeFluid(player, world, finalPos, fluidToPlace)) {
+        if (this.placeFluid(player, world, finalPos, fluidToPlace, stack)) {
             if (player instanceof ServerPlayerEntity serverPlayer) {
                 Criteria.PLACED_BLOCK.trigger(serverPlayer, finalPos, stack);
             }
@@ -304,13 +311,22 @@ public class LargeBucket extends Item {
         return ActionResult.FAIL;
     }
 
-    public boolean placeFluid(@Nullable PlayerEntity player, World world, BlockPos pos, Fluid fluid) {
+    public boolean placeFluid(@Nullable PlayerEntity player, World world, BlockPos pos, Fluid fluid, ItemStack stack) {
         if (!(fluid instanceof FlowableFluid flowableFluid)) {
             return false;
         }
 
         BlockState blockState = world.getBlockState(pos);
         Block block = blockState.getBlock();
+        int size = stack.getOrDefault(ENTITIES_SIZE, 0);
+
+        if (block == fluid.getDefaultState().getBlockState().getBlock()) {
+            if (size > 0) {
+                spawnEntity(world, stack, pos);
+            }
+            playEmptyingSound(player, world, pos, fluid);
+            return true;
+        }
 
         if (block == fluid.getDefaultState().getBlockState().getBlock()) {
             if (world.setBlockState(pos, fluid.getDefaultState().getBlockState(), 11)) {
@@ -319,7 +335,7 @@ public class LargeBucket extends Item {
             }
         }
 
-        if (block instanceof FluidFillable fluidFillable && fluidFillable.canFillWithFluid(player, world, pos, blockState, fluid)) {
+        if (block instanceof FluidFillable fluidFillable && fluidFillable.canFillWithFluid(player, world, pos, blockState, fluid) && size <= 0) {
             fluidFillable.tryFillWithFluid(world, pos, blockState, flowableFluid.getStill(false));
             playEmptyingSound(player, world, pos, fluid);
             return true;
@@ -331,6 +347,7 @@ public class LargeBucket extends Item {
 
         if (world.getDimension().ultrawarm() && fluid.isIn(FluidTags.WATER)) {
             world.playSound(player, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
+            if (size > 0) spawnEntity(world, stack, pos);
             for (int l = 0; l < 8; ++l) {
                 world.addImportantParticleClient(ParticleTypes.LARGE_SMOKE, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 0.0, 0.0, 0.0);
             }
@@ -342,11 +359,46 @@ public class LargeBucket extends Item {
         }
 
         if (world.setBlockState(pos, fluid.getDefaultState().getBlockState(), 11)) {
+            if (size > 0) spawnEntity(world, stack, pos);
             playEmptyingSound(player, world, pos, fluid);
             return true;
         }
 
         return false;
+    }
+
+    private void spawnEntity(World world, ItemStack stack, BlockPos pos) {
+        List<NbtCompound> originalEntities = stack.getOrDefault(ENTITIES_IN_BUCKET, List.of());
+        if (originalEntities.isEmpty()) {
+            return;
+        }
+        NbtCompound nbtCompound = originalEntities.getLast();
+        String entity = originalEntities.getLast().getString("id", "minecraft:cod");
+        EntityType<? extends MobEntity> entityType = switch (entity) {
+          case "minecraft:axolotl" -> EntityType.AXOLOTL;
+          case "minecraft:salmon" -> EntityType.SALMON;
+          case "minecraft:tropical_fish" -> EntityType.TROPICAL_FISH;
+          case "minecraft:pufferfish" -> EntityType.PUFFERFISH;
+          case "minecraft:tadpole" -> EntityType.TADPOLE;
+          default -> EntityType.COD;
+        };
+        MobEntity mobEntity = entityType.create(world, SpawnReason.BUCKET);
+        if (mobEntity instanceof Bucketable bucketable) {
+            mobEntity.readNbt(nbtCompound);
+
+            List<NbtCompound> updatedEntities = new ArrayList<>();
+            for (int i = 0; i < originalEntities.size() - 1; i++) {
+                updatedEntities.add(originalEntities.get(i).copy());
+            }
+            stack.set(ENTITIES_IN_BUCKET, updatedEntities);
+            stack.set(ENTITIES_SIZE, stack.getOrDefault(ENTITIES_SIZE, 0) - 1);
+            bucketable.setFromBucket(true);
+        }
+        if (mobEntity != null) {
+            world.spawnEntity(mobEntity);
+            mobEntity.refreshPositionAndAngles(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, (float) (Math.random() * 180.0F), (float) (Math.random() * 30.0F));
+            mobEntity.playAmbientSound();
+        }
     }
 
     protected void playEmptyingSound(@Nullable PlayerEntity user, WorldAccess world, BlockPos pos, Fluid fluid) {
@@ -377,21 +429,8 @@ public class LargeBucket extends Item {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
         super.appendTooltip(stack, context, displayComponent, textConsumer, type);
-        int currentFluid = stack.getOrDefault(FLUID_TYPE, 0);
-        int mode = stack.getOrDefault(MODE, 1);
-        if (mode == 1) textConsumer.accept(Text.translatable("tooltip.hoshikima.mode").append(Text.literal(": ").formatted(Formatting.GRAY)).append(Text.translatable("tooltip.hoshikima.load").withColor(new Color(38, 153, 0).getRGB())).formatted(Formatting.GRAY));
-        else textConsumer.accept(Text.translatable("tooltip.hoshikima.mode").append(Text.literal(": ").formatted(Formatting.GRAY)).append(Text.translatable("tooltip.hoshikima.unload").withColor(new Color(180, 0, 0).getRGB())).formatted(Formatting.GRAY));
-        if (currentFluid != 0) {
-            int currentCapacity = stack.getOrDefault(currentFluid == 1 ? WATER_CAPACITY : currentFluid == 2 ? LAVA_CAPACITY : SNOW_CAPACITY, 0);
-            if (currentFluid == 1) textConsumer.accept(Text.translatable("tooltip.hoshikima.water").withColor(new Color(0, 116, 216).getRGB()));
-            else if (currentFluid == 2) textConsumer.accept(Text.translatable("tooltip.hoshikima.lava").withColor(new Color(221, 76, 0).getRGB()));
-            else textConsumer.accept(Text.translatable("tooltip.hoshikima.powder_snow").withColor(new Color(255, 255, 255).getRGB()));
-            textConsumer.accept(Text.translatable("tooltip.hoshikima.capacity")
-                    .append(Text.literal(": " + currentCapacity + " / " + maxCapacity))
-                    .formatted(Formatting.GRAY));
-        } else textConsumer.accept(Text.translatable("tooltip.hoshikima.empty")
-                .formatted(Formatting.GRAY));
     }
 }

@@ -4,7 +4,9 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"ItemEntityMixin",
-		"FireworkAccessor"
+		"FireworkAccessor",
+		"AxolotlEntityMixin",
+		"FishEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

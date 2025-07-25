@@ -3,7 +3,8 @@
 	"package": "com.xxyxxdmc.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
-		"HoshikimaClientMixin"
+		"HoshikimaClientMixin",
+		"LargeBucketMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
