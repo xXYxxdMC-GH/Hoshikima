@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.xxyxxdmc.init.ModDataComponents.*;
 
@@ -43,15 +44,14 @@ public abstract class AxolotlEntityMixin extends AnimalEntity {
 
             NbtCompound cleanNbt = new NbtCompound();
             cleanNbt.putString("id", EntityType.getId(EntityType.AXOLOTL).toString());
-            if (fullNbt.contains("Brain")) cleanNbt.put("Brain", fullNbt.get("Brain"));
-            if (fullNbt.contains("Variant")) cleanNbt.putInt("Variant", fullNbt.getInt("Variant").get());
-            if (fullNbt.contains("Age")) cleanNbt.putInt("Age", fullNbt.getInt("Age").get());
-            if (fullNbt.contains("Health")) cleanNbt.putFloat("Health", fullNbt.getFloat("Health").get());
-            if (fullNbt.contains("CustomName")) cleanNbt.putString("CustomName", fullNbt.getString("CustomName").get());
-            if (fullNbt.contains("CustomNameVisible")) cleanNbt.putBoolean("CustomNameVisible", fullNbt.getBoolean("CustomNameVisible").get());
-            if (fullNbt.contains("PersistenceRequired")) cleanNbt.putBoolean("PersistenceRequired", fullNbt.getBoolean("PersistenceRequired").get());
+            if (fullNbt.contains("Variant")) cleanNbt.putInt("Variant", fullNbt.getInt("Variant", 0));
+            if (fullNbt.contains("Age")) cleanNbt.putInt("Age", fullNbt.getInt("Age",0));
+            if (fullNbt.contains("Health")) cleanNbt.putFloat("Health", fullNbt.getFloat("Health", 1.0F));
+            if (fullNbt.contains("CustomName")) cleanNbt.putString("CustomName", fullNbt.getString("CustomName", "Unknown"));
+            if (fullNbt.contains("CustomNameVisible")) cleanNbt.putBoolean("CustomNameVisible", fullNbt.getBoolean("CustomNameVisible", true));
+            if (fullNbt.contains("PersistenceRequired")) cleanNbt.putBoolean("PersistenceRequired", fullNbt.getBoolean("PersistenceRequired", false));
             cleanNbt.putBoolean("FromBucket", true);
-            if (fullNbt.contains("Brain")) {
+            if (fullNbt.contains("Brain") && fullNbt.getCompound("Brain").isPresent()) {
                 NbtCompound originalBrain = fullNbt.getCompound("Brain").get();
                 if (originalBrain.contains("memories")) {
                     NbtCompound originalMemories = originalBrain.getCompound("memories").get();
@@ -61,10 +61,10 @@ public abstract class AxolotlEntityMixin extends AnimalEntity {
                     String playDeadKey = "minecraft:play_dead_ticks";
 
                     if (originalMemories.contains(attackCooldownKey)) {
-                        cleanMemories.put(attackCooldownKey, originalMemories.get(attackCooldownKey).copy());
+                        cleanMemories.put(attackCooldownKey, Objects.requireNonNull(originalMemories.get(attackCooldownKey)).copy());
                     }
                     if (originalMemories.contains(playDeadKey)) {
-                        cleanMemories.put(playDeadKey, originalMemories.get(playDeadKey).copy());
+                        cleanMemories.put(playDeadKey, Objects.requireNonNull(originalMemories.get(playDeadKey)).copy());
                     }
 
                     if (!cleanMemories.isEmpty()) {

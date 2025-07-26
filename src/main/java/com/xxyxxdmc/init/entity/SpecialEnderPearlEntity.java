@@ -29,7 +29,7 @@ public class SpecialEnderPearlEntity extends EnderPearlEntity {
 
     protected void onCollision(HitResult hitResult) {
         for(int i = 0; i < 32; ++i) {
-            this.getWorld().addParticleClient(ParticleTypes.PORTAL, this.getX(), this.getY() + this.random.nextDouble() * (double)2.0F, this.getZ(), this.random.nextGaussian(), (double)0.0F, this.random.nextGaussian());
+            this.getWorld().addParticleClient(ParticleTypes.PORTAL, this.getX(), this.getY() + this.random.nextDouble() * (double)2.0F, this.getZ(), this.random.nextGaussian(), 0.0F, this.random.nextGaussian());
         }
         World var3 = this.getWorld();
         if (var3 instanceof ServerWorld serverWorld) {

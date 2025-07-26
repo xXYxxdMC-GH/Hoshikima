@@ -19,8 +19,8 @@ public abstract class LargeBucketMixin extends Item {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
-        LargeBucket self = (LargeBucket) (Object) this;
-        LargeBucketTooltip.append(stack, context, displayComponent, textConsumer, type);
+        LargeBucketTooltip.append(stack, textConsumer);
     }
 }

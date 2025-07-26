@@ -5,9 +5,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
 import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.entity.Bucketable;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.*;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FlowableFluid;
@@ -21,6 +19,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -40,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import static com.xxyxxdmc.init.ModDataComponents.*;
@@ -384,6 +384,7 @@ public class LargeBucket extends Item {
         };
         MobEntity mobEntity = entityType.create(world, SpawnReason.BUCKET);
         if (mobEntity instanceof Bucketable bucketable) {
+            if (nbtCompound.contains("BucketTicks")) nbtCompound.remove("BucketTicks");
             mobEntity.readNbt(nbtCompound);
 
             List<NbtCompound> updatedEntities = new ArrayList<>();
@@ -404,6 +405,14 @@ public class LargeBucket extends Item {
     protected void playEmptyingSound(@Nullable PlayerEntity user, WorldAccess world, BlockPos pos, Fluid fluid) {
         world.playSound(user, pos, fluid.isIn(FluidTags.WATER) ? SoundEvents.ITEM_BUCKET_EMPTY : SoundEvents.ITEM_BUCKET_EMPTY_LAVA, SoundCategory.BLOCKS, 1.0F, 1.0F);
         world.emitGameEvent(user, GameEvent.FLUID_PLACE, pos);
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
+        if (stack.getOrDefault(ENTITIES_SIZE, 0) <= 0) return;
+        if (!entity.isPlayer() || Objects.requireNonNull(entity.getServer()).getTicks() % 2 != 0) {
+        }
+
     }
 
     @Override
@@ -430,6 +439,7 @@ public class LargeBucket extends Item {
 
     @Override
     @Environment(EnvType.CLIENT)
+    @SuppressWarnings("deprecation")
     public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
         super.appendTooltip(stack, context, displayComponent, textConsumer, type);
     }

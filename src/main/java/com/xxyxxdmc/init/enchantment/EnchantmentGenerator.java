@@ -7,7 +7,6 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.minecraft.component.type.AttributeModifierSlot;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.tag.TagKey;
@@ -22,7 +21,7 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
 
     @Override
     protected void configure(RegistryWrapper.WrapperLookup registries, Entries entries) {
-        register(entries, ModEnchantments.ENDER_ESCAPE, Enchantment.builder(
+        register(entries, Enchantment.builder(
                                 Enchantment.definition(
                                         registries.getOrThrow(RegistryKeys.ITEM).getOrThrow(TagKey.of(RegistryKeys.ITEM, Identifier.of(Hoshikima.MOD_ID, "enchantable/ender_pearl_bundle"))),
                                         5,
@@ -36,8 +35,8 @@ public class EnchantmentGenerator extends FabricDynamicRegistryProvider {
         );
     }
 
-    private void register(Entries entries, RegistryKey<Enchantment> key, Enchantment.Builder builder, ResourceCondition... resourceConditions) {
-        entries.add(key, builder.build(key.getValue()), resourceConditions);
+    private void register(Entries entries, Enchantment.Builder builder, ResourceCondition... resourceConditions) {
+        entries.add(ModEnchantments.ENDER_ESCAPE, builder.build(ModEnchantments.ENDER_ESCAPE.getValue()), resourceConditions);
     }
 
     @Override

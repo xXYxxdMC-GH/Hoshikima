@@ -1,10 +1,7 @@
 package com.xxyxxdmc.init.item.client;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.component.type.TooltipDisplayComponent;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -16,7 +13,7 @@ import java.util.function.Consumer;
 import static com.xxyxxdmc.init.ModDataComponents.*;
 
 public class LargeBucketTooltip {
-    public static void append(ItemStack stack, Item.TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
+    public static void append(ItemStack stack, Consumer<Text> textConsumer) {
         int currentFluid = stack.getOrDefault(FLUID_TYPE, 0);
         int mode = stack.getOrDefault(MODE, 1);
         int size = stack.getOrDefault(ENTITIES_IN_BUCKET, List.of()).size();
@@ -45,14 +42,14 @@ public class LargeBucketTooltip {
                 for (NbtCompound entityNbt : entities) {
                     Text entityName;
                     if (entityNbt.contains("CustomName")) {
-                        entityName = Text.of(entityNbt.getString("CustomName").get() + " (" + Text.translatable("entity." + entityNbt.getString("id").get().replace(':', '.')).getString() + ")");
+                        entityName = Text.of(entityNbt.getString("CustomName", "Unknown") + " (" + Text.translatable("entity." + entityNbt.getString("id", "minecraft:cod").replace(':', '.')).getString() + ")");
                     } else {
-                        String entityId = entityNbt.getString("id").get();
+                        String entityId = entityNbt.getString("id", "minecraft:cod");
                         String translationKey = "entity." + entityId.replace(':', '.');
                         entityName = Text.translatable(translationKey);
                     }
-                    if (entityNbt.contains("Variant") && entityNbt.getString("id").get().equals("minecraft:axolotl")) {
-                        Color color = switch (entityNbt.getInt("Variant").get()) {
+                    if (entityNbt.contains("Variant") && entityNbt.getString("id", "minecraft:cod").equals("minecraft:axolotl")) {
+                        Color color = switch (entityNbt.getInt("Variant", 0)) {
                             case 1 -> new Color(162,122,86);
                             case 2 -> new Color(255,209,27);
                             case 3 -> new Color(176,213,252);
