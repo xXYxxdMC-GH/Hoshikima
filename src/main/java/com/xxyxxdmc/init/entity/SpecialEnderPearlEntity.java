@@ -57,7 +57,7 @@ public class SpecialEnderPearlEntity extends EnderPearlEntity {
                                 serverPlayerEntity2.clearCurrentExplosion();
                                 boolean amount = true;
                                 for (RegistryEntry<Enchantment> enchantment : serverPlayerEntity2.getStackInHand(Hand.MAIN_HAND).getEnchantments().getEnchantments()) {
-                                    if (enchantment.value().toString().equals("Enchantment Ender Escape")) amount = false;
+                                    if (((RegistryEntry.Reference) enchantment).registryKey().getValue().toString().equals("hoshikima:ender_escape")) amount = false;
                                 }
                                 serverPlayerEntity2.damage(serverPlayerEntity.getServerWorld(), this.getDamageSources().enderPearl(), amount ? 5.0F : 0.0F);
                             }

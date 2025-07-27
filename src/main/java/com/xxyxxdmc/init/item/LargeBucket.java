@@ -1,5 +1,6 @@
 package com.xxyxxdmc.init.item;
 
+import com.xxyxxdmc.init.other.LargeBucketEcoSystem;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
@@ -46,6 +47,7 @@ import static com.xxyxxdmc.init.ModDataComponents.*;
 
 public class LargeBucket extends Item {
     private final int maxCapacity = 8;
+    private final LargeBucketEcoSystem ecoSystem = new LargeBucketEcoSystem();
 
     public LargeBucket(Settings settings) {
         super(settings.maxCount(1).component(FLUID_TYPE, 0).component(WATER_CAPACITY, 0).component(LAVA_CAPACITY, 0).component(SNOW_CAPACITY, 0).component(MODE, 1).component(ENTITIES_IN_BUCKET, new ArrayList<>()));
@@ -410,9 +412,12 @@ public class LargeBucket extends Item {
     @Override
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
         if (stack.getOrDefault(ENTITIES_SIZE, 0) <= 0) return;
-        if (!entity.isPlayer() || Objects.requireNonNull(entity.getServer()).getTicks() % 2 != 0) {
+        if (!entity.isPlayer() && Objects.requireNonNull(entity.getServer()).getTicks() % 2 != 0) {
+            List<NbtCompound> oldList = stack.getOrDefault(ENTITIES_IN_BUCKET, new ArrayList<>());
+            ecoSystem.refreshSystemMembers(oldList);
+            List<NbtCompound> newList = ecoSystem.processEntitiesRelationship();
+            if (!oldList.equals(newList)) stack.set(ENTITIES_IN_BUCKET, newList);
         }
-
     }
 
     @Override
