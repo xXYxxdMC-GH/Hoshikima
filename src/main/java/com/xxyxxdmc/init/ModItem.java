@@ -19,6 +19,7 @@ public class ModItem {
     public static final Item FIREWORK_THRUSTER = register("firework_thruster", FireworkThruster::new, new Item.Settings());
     public static final Item LARGE_BUCKET = register("large_bucket", LargeBucket::new, new Item.Settings());
     public static final Item MULTI_FLUID_BUCKET = register("multi_fluid_bucket", MultiFluidBucket::new, new Item.Settings());
+    public static final Item ROTTEN_FLESH_CLUSTER = register("rotten_flesh_cluster", Item::new, new Item.Settings());
     public static Item register(String name, Function<Item.Settings, Item> itemFactory, Item.Settings settings) {
         RegistryKey<Item> itemKey = RegistryKey.of(RegistryKeys.ITEM, Identifier.of(Hoshikima.MOD_ID, name));
         Item item = itemFactory.apply(settings.registryKey(itemKey));

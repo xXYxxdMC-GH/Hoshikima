@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "RRR",
+        "RRR",
+        "RRR"
+    ],
+    "key": {
+        "R": "minecraft:rotten_flesh"
+    },
+    "result": {
+        "id": "hoshikima:rotten_flesh_cluster",
+        "count": 1
+    }
+}
