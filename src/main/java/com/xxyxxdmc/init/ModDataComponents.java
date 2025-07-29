@@ -3,6 +3,7 @@ package com.xxyxxdmc.init;
 import com.mojang.serialization.Codec;
 import com.xxyxxdmc.Hoshikima;
 import net.minecraft.component.ComponentType;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.registry.Registries;
@@ -38,6 +39,13 @@ public class ModDataComponents {
             ComponentType.<List<NbtCompound>>builder()
                     .codec(NbtCompound.CODEC.listOf())
                     .packetCodec(PacketCodecs.NBT_COMPOUND.collect(PacketCodecs.toList()))
+                    .build()
+    );
+    public static final ComponentType<List<ItemStack>> PENDING_DROPS = Registry.register(
+            Registries.DATA_COMPONENT_TYPE,
+            Identifier.of(Hoshikima.MOD_ID, "pending_drops"),
+            ComponentType.<List<ItemStack>>builder()
+                    .codec(ItemStack.CODEC.listOf())
                     .build()
     );
     private static ComponentType<Integer> registerInt(String path) {

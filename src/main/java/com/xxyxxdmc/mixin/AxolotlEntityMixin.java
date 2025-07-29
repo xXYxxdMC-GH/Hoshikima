@@ -1,6 +1,8 @@
 package com.xxyxxdmc.mixin;
 
+import com.xxyxxdmc.init.LargeBucketInteractionHelper;
 import com.xxyxxdmc.init.ModItem;
+import com.xxyxxdmc.init.other.LargeBucketEcoSystem;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.passive.AxolotlEntity;
@@ -31,61 +33,15 @@ public abstract class AxolotlEntityMixin extends AnimalEntity {
 
     @Inject(method = "interactMob", at = @At("HEAD"), cancellable = true)
     private void onInteractWithLargeBucket(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        ItemStack stack = player.getStackInHand(hand);
+        ActionResult result = LargeBucketInteractionHelper.tryPickup(
+                (AxolotlEntity) (Object) this,
+                player,
+                hand,
+                SoundEvents.ITEM_BUCKET_FILL_AXOLOTL
+        );
 
-        if (stack.isOf(ModItem.LARGE_BUCKET)
-                && stack.getOrDefault(FLUID_TYPE, 0) == 1
-                && stack.getOrDefault(MODE, 1) == 1
-                && stack.getOrDefault(WATER_CAPACITY, 0) - stack.getOrDefault(ENTITIES_SIZE, 0) > 0) {
-            List<NbtCompound> entities = new ArrayList<>(stack.getOrDefault(ENTITIES_IN_BUCKET, List.of()));
-            AxolotlEntity axolotl = (AxolotlEntity) (Object) this;
-            NbtCompound fullNbt = new NbtCompound();
-            axolotl.saveNbt(fullNbt);
-
-            NbtCompound cleanNbt = new NbtCompound();
-            cleanNbt.putString("id", EntityType.getId(EntityType.AXOLOTL).toString());
-            if (fullNbt.contains("Variant")) cleanNbt.putInt("Variant", fullNbt.getInt("Variant", 0));
-            if (fullNbt.contains("Age")) cleanNbt.putInt("Age", fullNbt.getInt("Age",0));
-            if (fullNbt.contains("Health")) cleanNbt.putFloat("Health", fullNbt.getFloat("Health", 1.0F));
-            if (fullNbt.contains("CustomName")) cleanNbt.putString("CustomName", fullNbt.getString("CustomName", "Unknown"));
-            if (fullNbt.contains("CustomNameVisible")) cleanNbt.putBoolean("CustomNameVisible", fullNbt.getBoolean("CustomNameVisible", true));
-            if (fullNbt.contains("PersistenceRequired")) cleanNbt.putBoolean("PersistenceRequired", fullNbt.getBoolean("PersistenceRequired", false));
-            cleanNbt.putBoolean("FromBucket", true);
-            if (fullNbt.contains("Brain") && fullNbt.getCompound("Brain").isPresent()) {
-                NbtCompound originalBrain = fullNbt.getCompound("Brain").get();
-                if (originalBrain.contains("memories")) {
-                    NbtCompound originalMemories = originalBrain.getCompound("memories").get();
-                    NbtCompound cleanMemories = new NbtCompound();
-
-                    String attackCooldownKey = "minecraft:has_hunting_cooldown";
-                    String playDeadKey = "minecraft:play_dead_ticks";
-
-                    if (originalMemories.contains(attackCooldownKey)) {
-                        cleanMemories.put(attackCooldownKey, Objects.requireNonNull(originalMemories.get(attackCooldownKey)).copy());
-                    }
-                    if (originalMemories.contains(playDeadKey)) {
-                        cleanMemories.put(playDeadKey, Objects.requireNonNull(originalMemories.get(playDeadKey)).copy());
-                    }
-
-                    if (!cleanMemories.isEmpty()) {
-                        NbtCompound cleanBrain = new NbtCompound();
-                        cleanBrain.put("memories", cleanMemories);
-                        cleanNbt.put("Brain", cleanBrain);
-                    }
-                }
-            }
-
-            entities.add(cleanNbt);
-            stack.set(ENTITIES_IN_BUCKET, entities);
-            int size = stack.getOrDefault(ENTITIES_SIZE, 0);
-            stack.set(ENTITIES_SIZE, ++size);
-
-            player.playSound(SoundEvents.ITEM_BUCKET_FILL_AXOLOTL, 1.0F, 1.0F);
-            player.incrementStat(Stats.USED.getOrCreateStat(stack.getItem()));
-
-            axolotl.discard();
-
-            cir.setReturnValue(ActionResult.SUCCESS);
+        if (result.isAccepted()) {
+            cir.setReturnValue(result);
         }
     }
 }

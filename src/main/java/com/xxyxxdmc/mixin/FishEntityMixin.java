@@ -1,11 +1,11 @@
 package com.xxyxxdmc.mixin;
 
+import com.xxyxxdmc.init.LargeBucketInteractionHelper;
 import com.xxyxxdmc.init.ModItem;
+import com.xxyxxdmc.init.other.LargeBucketEcoSystem;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.passive.FishEntity;
-import net.minecraft.entity.passive.PufferfishEntity;
-import net.minecraft.entity.passive.TropicalFishEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -29,49 +29,17 @@ public abstract class FishEntityMixin extends WaterCreatureEntity {
     protected FishEntityMixin(EntityType<? extends WaterCreatureEntity> entityType, World world) {
         super(entityType, world);
     }
-
     @Inject(method = "interactMob", at = @At("HEAD"), cancellable = true)
     private void onInteractWithLargeBucket(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        ItemStack stack = player.getStackInHand(hand);
+        ActionResult result = LargeBucketInteractionHelper.tryPickup(
+                (FishEntity) (Object) this,
+                player,
+                hand,
+                SoundEvents.ITEM_BUCKET_FILL_FISH
+        );
 
-        if (stack.isOf(ModItem.LARGE_BUCKET)
-                && stack.getOrDefault(FLUID_TYPE, 0) == 1
-                && stack.getOrDefault(MODE, 1) == 1
-                && stack.getOrDefault(WATER_CAPACITY, 0) - stack.getOrDefault(ENTITIES_SIZE, 0) > 0) {
-            List<NbtCompound> entities = new ArrayList<>(stack.getOrDefault(ENTITIES_IN_BUCKET, List.of()));
-            FishEntity fish = (FishEntity) (Object) this;
-            NbtCompound cleanNbt = new NbtCompound();
-            NbtCompound fullNbt = new NbtCompound();
-            fish.saveNbt(fullNbt);
-            cleanNbt.putString("id", EntityType.getId(this.getType()).toString());
-            cleanNbt.putFloat("Health", fish.getHealth());
-            if (fish.hasCustomName()) {
-                cleanNbt.putString("CustomName", fish.getCustomName().getString());
-            }
-            if (this.isPersistent()) {
-                cleanNbt.putBoolean("PersistenceRequired", true);
-            }
-
-            if (fish instanceof TropicalFishEntity) {
-                if (fullNbt.contains("Variant")) {
-                    cleanNbt.put("Variant", fullNbt.get("Variant").copy());
-                }
-            } else if (fish instanceof PufferfishEntity pufferFish) {
-                cleanNbt.putInt("PuffState", pufferFish.getPuffState());
-            }
-
-            cleanNbt.putBoolean("FromBucket", true);
-            entities.add(cleanNbt);
-            stack.set(ENTITIES_IN_BUCKET, entities);
-            int size = stack.getOrDefault(ENTITIES_SIZE, 0);
-            stack.set(ENTITIES_SIZE, ++size);
-
-            player.playSound(SoundEvents.ITEM_BUCKET_FILL_FISH, 1.0F, 1.0F);
-            player.incrementStat(Stats.USED.getOrCreateStat(stack.getItem()));
-
-            fish.discard();
-
-            cir.setReturnValue(ActionResult.SUCCESS);
+        if (result.isAccepted()) {
+            cir.setReturnValue(result);
         }
     }
 }

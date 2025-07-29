@@ -15,6 +15,7 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
@@ -38,9 +39,8 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 import static com.xxyxxdmc.init.ModDataComponents.*;
@@ -50,7 +50,13 @@ public class LargeBucket extends Item {
     private final LargeBucketEcoSystem ecoSystem = new LargeBucketEcoSystem();
 
     public LargeBucket(Settings settings) {
-        super(settings.maxCount(1).component(FLUID_TYPE, 0).component(WATER_CAPACITY, 0).component(LAVA_CAPACITY, 0).component(SNOW_CAPACITY, 0).component(MODE, 1).component(ENTITIES_IN_BUCKET, new ArrayList<>()));
+        super(settings.maxCount(1).component(FLUID_TYPE, 0)
+                .component(WATER_CAPACITY, 0)
+                .component(LAVA_CAPACITY, 0)
+                .component(SNOW_CAPACITY, 0)
+                .component(MODE, 1)
+                .component(ENTITIES_IN_BUCKET, new ArrayList<>())
+                .component(PENDING_DROPS, List.of()));
     }
 
     @Override
@@ -320,24 +326,15 @@ public class LargeBucket extends Item {
 
         BlockState blockState = world.getBlockState(pos);
         Block block = blockState.getBlock();
-        int size = stack.getOrDefault(ENTITIES_SIZE, 0);
 
         if (block == fluid.getDefaultState().getBlockState().getBlock()) {
-            if (size > 0) {
-                spawnEntity(world, stack, pos);
-            }
+            releaseContents(world, stack, pos);
             playEmptyingSound(player, world, pos, fluid);
             return true;
         }
 
-        if (block == fluid.getDefaultState().getBlockState().getBlock()) {
-            if (world.setBlockState(pos, fluid.getDefaultState().getBlockState(), 11)) {
-                playEmptyingSound(player, world, pos, fluid);
-                return true;
-            }
-        }
-
-        if (block instanceof FluidFillable fluidFillable && fluidFillable.canFillWithFluid(player, world, pos, blockState, fluid) && size <= 0) {
+        boolean hasContents = stack.getOrDefault(ENTITIES_SIZE, 0) > 0 || !stack.getOrDefault(PENDING_DROPS, List.of()).isEmpty();
+        if (block instanceof FluidFillable fluidFillable && fluidFillable.canFillWithFluid(player, world, pos, blockState, fluid) && !hasContents) {
             fluidFillable.tryFillWithFluid(world, pos, blockState, flowableFluid.getStill(false));
             playEmptyingSound(player, world, pos, fluid);
             return true;
@@ -349,7 +346,7 @@ public class LargeBucket extends Item {
 
         if (world.getDimension().ultrawarm() && fluid.isIn(FluidTags.WATER)) {
             world.playSound(player, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
-            if (size > 0) spawnEntity(world, stack, pos);
+            releaseContents(world, stack, pos);
             for (int l = 0; l < 8; ++l) {
                 world.addImportantParticleClient(ParticleTypes.LARGE_SMOKE, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 0.0, 0.0, 0.0);
             }
@@ -361,7 +358,7 @@ public class LargeBucket extends Item {
         }
 
         if (world.setBlockState(pos, fluid.getDefaultState().getBlockState(), 11)) {
-            if (size > 0) spawnEntity(world, stack, pos);
+            releaseContents(world, stack, pos);
             playEmptyingSound(player, world, pos, fluid);
             return true;
         }
@@ -369,37 +366,73 @@ public class LargeBucket extends Item {
         return false;
     }
 
-    private void spawnEntity(World world, ItemStack stack, BlockPos pos) {
-        List<NbtCompound> originalEntities = stack.getOrDefault(ENTITIES_IN_BUCKET, List.of());
-        if (originalEntities.isEmpty()) {
+    private void releaseContents(World world, ItemStack stack, BlockPos pos) {
+        spawnEntity(world, stack, pos);
+        releasePendingDrops(world, stack, pos);
+    }
+
+    private void releasePendingDrops(World world, ItemStack stack, BlockPos pos) {
+        List<ItemStack> pendingDrops = stack.get(PENDING_DROPS);
+        if (pendingDrops == null || pendingDrops.isEmpty()) {
             return;
         }
-        NbtCompound nbtCompound = originalEntities.getLast();
-        String entity = originalEntities.getLast().getString("id", "minecraft:cod");
-        EntityType<? extends MobEntity> entityType = switch (entity) {
-          case "minecraft:axolotl" -> EntityType.AXOLOTL;
-          case "minecraft:salmon" -> EntityType.SALMON;
-          case "minecraft:tropical_fish" -> EntityType.TROPICAL_FISH;
-          case "minecraft:pufferfish" -> EntityType.PUFFERFISH;
-          case "minecraft:tadpole" -> EntityType.TADPOLE;
-          default -> EntityType.COD;
-        };
-        MobEntity mobEntity = entityType.create(world, SpawnReason.BUCKET);
-        if (mobEntity instanceof Bucketable bucketable) {
-            if (nbtCompound.contains("BucketTicks")) nbtCompound.remove("BucketTicks");
-            mobEntity.readNbt(nbtCompound);
 
-            List<NbtCompound> updatedEntities = new ArrayList<>();
-            for (int i = 0; i < originalEntities.size() - 1; i++) {
-                updatedEntities.add(originalEntities.get(i).copy());
+        if (!world.isClient) {
+            for (ItemStack drop : pendingDrops) {
+                ItemEntity itemEntity = new ItemEntity(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, drop);
+                itemEntity.setToDefaultPickupDelay();
+                world.spawnEntity(itemEntity);
             }
-            stack.set(ENTITIES_IN_BUCKET, updatedEntities);
-            stack.set(ENTITIES_SIZE, stack.getOrDefault(ENTITIES_SIZE, 0) - 1);
-            bucketable.setFromBucket(true);
+            stack.set(PENDING_DROPS, List.of());
         }
+    }
+
+    private void spawnEntity(World world, ItemStack stack, BlockPos pos) {
+        List<NbtCompound> currentSlots = new ArrayList<>(stack.getOrDefault(ENTITIES_IN_BUCKET, List.of()));
+        if (currentSlots.isEmpty()) {
+            return;
+        }
+
+        int lastEntityIndex = -1;
+        for (int i = currentSlots.size() - 1; i >= 0; i--) {
+            if (!LargeBucketEcoSystem.isEmpty(currentSlots.get(i))) {
+                lastEntityIndex = i;
+                break;
+            }
+        }
+
+        if (lastEntityIndex == -1) {
+            return;
+        }
+
+        NbtCompound nbtCompound = currentSlots.get(lastEntityIndex);
+        String entityId = nbtCompound.getString("id", "");
+
+        EntityType<? extends MobEntity> entityType = switch (entityId) {
+            case "minecraft:axolotl" -> EntityType.AXOLOTL;
+            case "minecraft:salmon" -> EntityType.SALMON;
+            case "minecraft:tropical_fish" -> EntityType.TROPICAL_FISH;
+            case "minecraft:pufferfish" -> EntityType.PUFFERFISH;
+            case "minecraft:tadpole" -> EntityType.TADPOLE;
+            default -> EntityType.COD;
+        };
+
+        MobEntity mobEntity = entityType.create(world, SpawnReason.BUCKET);
         if (mobEntity != null) {
+            if (mobEntity instanceof Bucketable bucketable) {
+                sweepNbt(nbtCompound, "Died");
+                sweepNbt(nbtCompound, "PuffCooldown");
+                sweepNbt(nbtCompound, "AttackCooldown");
+                mobEntity.readNbt(nbtCompound);
+                bucketable.setFromBucket(true);
+            }
+
+            currentSlots.set(lastEntityIndex, LargeBucketEcoSystem.createEmptyEntity());
+            stack.set(ENTITIES_IN_BUCKET, currentSlots);
+            stack.set(ENTITIES_SIZE, stack.getOrDefault(ENTITIES_SIZE, 1) - 1);
+
             world.spawnEntity(mobEntity);
-            mobEntity.refreshPositionAndAngles(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, (float) (Math.random() * 180.0F), (float) (Math.random() * 30.0F));
+            mobEntity.refreshPositionAndAngles(pos.getX() + 0.5, pos.getY() + 0.25, pos.getZ() + 0.5, world.random.nextFloat() * 360.0F, 0.0F);
             mobEntity.playAmbientSound();
         }
     }
@@ -409,15 +442,49 @@ public class LargeBucket extends Item {
         world.emitGameEvent(user, GameEvent.FLUID_PLACE, pos);
     }
 
+    private void sweepNbt(NbtCompound entity, String element) {
+        if (entity.contains(element)) {
+            entity.remove(element);
+        }
+    }
+
     @Override
     public void inventoryTick(ItemStack stack, ServerWorld world, Entity entity, @Nullable EquipmentSlot slot) {
-        if (stack.getOrDefault(ENTITIES_SIZE, 0) <= 0) return;
-        if (!entity.isPlayer() && Objects.requireNonNull(entity.getServer()).getTicks() % 2 != 0) {
-            List<NbtCompound> oldList = stack.getOrDefault(ENTITIES_IN_BUCKET, new ArrayList<>());
-            ecoSystem.refreshSystemMembers(oldList);
-            List<NbtCompound> newList = ecoSystem.processEntitiesRelationship();
-            if (!oldList.equals(newList)) stack.set(ENTITIES_IN_BUCKET, newList);
+        int waterCapacity = stack.getOrDefault(WATER_CAPACITY, 0);
+        int entityCount = stack.getOrDefault(ENTITIES_SIZE, 0);
+        if (waterCapacity <= 0 || entityCount <= 0) return;
+        if (entity.isPlayer() && world.getServer().getTicks() % 2 == 0) {
+            List<NbtCompound> oldEntities = stack.getOrDefault(ENTITIES_IN_BUCKET, List.of());
+            LargeBucketEcoSystem.EcosystemTickResult result = ecoSystem.processTick(new ArrayList<>(oldEntities), waterCapacity);
+            List<NbtCompound> newEntities = result.allEntities();
+            if (!oldEntities.equals(newEntities)) {
+                stack.set(ENTITIES_IN_BUCKET, newEntities);
+                stack.set(ENTITIES_SIZE, result.updatedEntities().size());
+            }
+            List<NbtCompound> deadThisTick = result.deadEntities();
+            if (!deadThisTick.isEmpty()) {
+                List<ItemStack> pendingDrops = new ArrayList<>(stack.getOrDefault(PENDING_DROPS, List.of()));
+                for (NbtCompound deadNbt : deadThisTick) {
+                    ItemStack dropStack = convertDeadNbtToItemStack(deadNbt);
+                    if (!dropStack.isEmpty()) {
+                        pendingDrops.add(dropStack);
+                    }
+                }
+                stack.set(PENDING_DROPS, pendingDrops);
+                entity.playSound(SoundEvents.ENTITY_ITEM_BREAK.value(), 0.8F, 0.8F + world.random.nextFloat() * 0.4F);
+            }
         }
+    }
+
+    private ItemStack convertDeadNbtToItemStack(NbtCompound deadNbt) {
+        String id = deadNbt.getString("id", "");
+        return switch (id) {
+            case "minecraft:cod" -> new ItemStack(Items.COD);
+            case "minecraft:salmon" -> new ItemStack(Items.SALMON);
+            case "minecraft:pufferfish" -> new ItemStack(Items.PUFFERFISH);
+            case "minecraft:tropical_fish" -> new ItemStack(Items.TROPICAL_FISH);
+            default -> ItemStack.EMPTY;
+        };
     }
 
     @Override
