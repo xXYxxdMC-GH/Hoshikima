@@ -148,7 +148,7 @@ public class LargeBucketEcoSystem {
         if (axolotl.contains(BRAIN_KEY)) {
             NbtCompound memories = axolotl.getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY);
             int attackCooldown = axolotl.getInt(ATTACK_COOLDOWN_KEY, 0);
-            if (attackCooldown > 0) axolotl.putInt(ATTACK_COOLDOWN_KEY, attackCooldown - 1);;
+            if (attackCooldown > 0) axolotl.putInt(ATTACK_COOLDOWN_KEY, attackCooldown - 1);
             return !memories.contains(HUNTING_COOLDOWN_MEMORY) && !memories.contains(PLAY_DEAD_TICKS_MEMORY) && attackCooldown <= 0;
         }
         return true;

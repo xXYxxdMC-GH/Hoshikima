@@ -12,6 +12,7 @@ public class ModEnchantments {
         Identifier id = Identifier.of(Hoshikima.MOD_ID, "ender_escape");
         return RegistryKey.of(RegistryKeys.ENCHANTMENT, id);
     }
+    @SuppressWarnings("EmptyMethod")
     public static void registerModEnchantmentEffects() {
     }
 }

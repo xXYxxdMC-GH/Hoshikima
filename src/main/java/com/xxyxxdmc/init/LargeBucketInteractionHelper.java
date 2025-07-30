@@ -3,7 +3,6 @@ package com.xxyxxdmc.init;
 import com.xxyxxdmc.init.other.LargeBucketEcoSystem;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.WaterCreatureEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;

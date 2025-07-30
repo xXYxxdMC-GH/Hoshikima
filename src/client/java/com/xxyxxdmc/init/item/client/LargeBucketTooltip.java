@@ -5,7 +5,6 @@ import net.minecraft.entity.passive.TropicalFishEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
 import net.minecraft.util.Formatting;
 
 import java.awt.*;
@@ -13,7 +12,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static com.xxyxxdmc.init.ModDataComponents.*;
-import static net.minecraft.entity.passive.TropicalFishEntity.DEFAULT_VARIANT;
 
 public class LargeBucketTooltip {
     public static void append(ItemStack stack, Consumer<Text> textConsumer) {

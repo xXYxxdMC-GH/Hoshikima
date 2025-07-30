@@ -12,6 +12,7 @@ import net.minecraft.util.Identifier;
 
 import java.util.List;
 
+@SuppressWarnings("EmptyMethod")
 public class ModDataComponents {
     public static final ComponentType<Integer> FUEL = registerInt("fuel");
     public static final ComponentType<Integer> POWER = registerInt("power");
