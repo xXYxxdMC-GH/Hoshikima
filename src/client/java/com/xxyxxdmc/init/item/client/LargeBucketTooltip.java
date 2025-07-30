@@ -66,10 +66,15 @@ public class LargeBucketTooltip {
                             textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(entityName.copy().withColor(color.getRGB())));
                         } else if (entityNbt.getString("id", "minecraft:cod").equals("minecraft:tropical_fish")) {
                             TropicalFishEntity.Variant variant = entityNbt.get("Variant", TropicalFishEntity.Variant.CODEC).orElse(TropicalFishEntity.DEFAULT_VARIANT);
-                            DyeColor baseColor = variant.baseColor();
-                            DyeColor patternColor = variant.patternColor();
+                            Color baseColor = new Color(variant.baseColor().getMapColor().color);
+                            Color patternColor = new Color(variant.patternColor().getMapColor().color);
+                            String name = entityName.getString();
+                            Text firstWord = Text.of(name.contains(" ") ? name.split(" ")[0] : name.substring(0, name.length() / 2)).copy().withColor(baseColor.getRGB());
+                            Text lastWord = Text.of(name.substring(firstWord.getString().length())).copy().withColor(patternColor.getRGB());
+                            textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(firstWord).append(lastWord));
                         }
-                    } else textConsumer.accept(Text.literal("  - ").append(entityName).formatted(Formatting.DARK_GRAY));
+                    } else if (entityNbt.getString("id", "minecraft:cod").equals("hoshikima:empty")) textConsumer.accept(Text.literal("  - ").append(entityName).formatted(Formatting.DARK_GRAY));
+                    else textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(entityName.copy().formatted(Formatting.GRAY)));
                 }
             } else {
                 textConsumer.accept(Text.translatable("tooltip.hoshikima.entity", size).append(Text.translatable("tooltip.hoshikima.detail")).formatted(Formatting.GRAY));
