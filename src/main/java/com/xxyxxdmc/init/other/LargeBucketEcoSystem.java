@@ -58,11 +58,7 @@ public class LargeBucketEcoSystem {
         processPufferfishBehavior(slots);
         processAxolotlBehavior(slots);
 
-        for (NbtCompound entity : slots) {
-            if (!isEmpty(entity)) {
-                processPoisonEffect(entity);
-            }
-        }
+        processEntityTimers(slots);
 
         ClearResult clearResult = cleanupDeadEntities(slots);
 
@@ -120,7 +116,7 @@ public class LargeBucketEcoSystem {
                 .toList();
         if (axolotls.isEmpty()) return;
 
-        List<String> victimIds = List.of("minecraft:cod", "minecraft:salmon", "minecraft:tropical_fish", "minecraft:squid", "minecraft:glow_squid");
+        List<String> victimIds = List.of("minecraft:cod", "minecraft:salmon", "minecraft:tropical_fish", "minecraft:pufferfish");
         List<NbtCompound> victims = slots.stream()
                 .filter(e -> victimIds.contains(e.getString(ID_KEY, "")) && !e.getBoolean(DIED_KEY, false))
                 .toList();
@@ -132,7 +128,7 @@ public class LargeBucketEcoSystem {
                     .findFirst()
                     .ifPresent(target -> {
                         attack(axolotl, target, false);
-                        processAxolotlState(axolotl, 0);
+                        if (target.getBoolean(DIED_KEY, false)) processAxolotlState(axolotl, 0);
                     });
         }
     }
@@ -148,7 +144,7 @@ public class LargeBucketEcoSystem {
     private void processPufferfishBehavior(List<NbtCompound> slots) {
         for (int i = 0; i < slots.size(); i++) {
             NbtCompound pufferfish = slots.get(i);
-            if (!PUFFERFISH_ID.equals(pufferfish.getString(ID_KEY, ""))) {
+            if (!PUFFERFISH_ID.equals(pufferfish.getString(ID_KEY, "")) || pufferfish.getBoolean(DIED_KEY, false)) {
                 continue;
             }
 
@@ -198,7 +194,7 @@ public class LargeBucketEcoSystem {
         int currentIndex = startIndex + direction;
         while (currentIndex >= 0 && currentIndex < slots.size()) {
             NbtCompound neighbor = slots.get(currentIndex);
-            if (!isEmpty(neighbor)) {
+            if (!isEmpty(neighbor) && !neighbor.getBoolean(DIED_KEY, false)) {
                 return neighbor;
             }
             currentIndex += direction;
@@ -261,32 +257,6 @@ public class LargeBucketEcoSystem {
         }
     }
 
-    public void processPoisonEffect(NbtCompound victim) {
-        NbtList active_effects;
-        if (victim.contains("active_effects") && victim.getList("active_effects").isPresent()) active_effects = victim.getList("active_effects").get();
-        else return;
-        Iterator<NbtElement> iterator = active_effects.iterator();
-        while (iterator.hasNext()) {
-            NbtElement effect = iterator.next();
-            if (effect.asCompound().isPresent()
-                    && effect.asCompound().get().contains("id")) {
-                if (effect.asCompound().get().getString("id", "minecraft:hunger").equals("minecraft:poison")) {
-                    attack(null, victim, false);
-                    int duration = effect.asCompound().get().getInt("duration", 0);
-                    if (duration - 25 <= 0) iterator.remove();
-                    else effect.asCompound().get().putInt("duration", duration - 25);
-                } else if (effect.asCompound().get().getString("id", "minecraft:hunger").equals("minecraft:regeneration")) {
-                    float health = victim.getFloat("Health", 1.0F);
-                    victim.putFloat("Health", health + 1);
-                    int duration = effect.asCompound().get().getInt("duration", 0);
-                    if (duration - 50 <= 0) iterator.remove();
-                    else effect.asCompound().get().putInt("duration", duration - 50);
-                }
-                break;
-            }
-        }
-        active_effects.removeIf(e -> e instanceof NbtCompound eff && "minecraft:poison".equals(eff.getString(ID_KEY, "")) && eff.getInt("duration", 0) <= 0);
-    }
     public void attackWithPoison(NbtCompound victim, int duration) {
         if (duration <= 0) return;
 
@@ -318,5 +288,74 @@ public class LargeBucketEcoSystem {
             }
         }
         return new ClearResult(slots, deadEntities);
+    }
+
+    private void processEntityTimers(List<NbtCompound> slots) {
+        for (NbtCompound entity : slots) {
+            if (isEmpty(entity) || entity.getBoolean(DIED_KEY, false)) {
+                continue;
+            }
+
+            if (AXOLOTL_ID.equals(entity.getString(ID_KEY, ""))) {
+                processAxolotlMemories(entity);
+            }
+
+            processActiveEffects(entity);
+        }
+    }
+
+    private void processAxolotlMemories(NbtCompound axolotl) {
+        if (!axolotl.contains(BRAIN_KEY)) return;
+        NbtCompound brain = axolotl.getCompoundOrEmpty(BRAIN_KEY);
+        if (!brain.contains(MEMORIES_KEY)) return;
+        NbtCompound memories = brain.getCompoundOrEmpty(MEMORIES_KEY);
+        List<String> memoriesToRemove = new ArrayList<>();
+        for (String key : memories.getKeys()) {
+            if (memories.get(key) instanceof NbtCompound memoryData && memoryData.contains("ttl")) {
+                long ttl = memoryData.getLong("ttl", 0L);
+                ttl--;
+                if (ttl <= 0) {
+                    memoriesToRemove.add(key);
+                } else {
+                    memoryData.putLong("ttl", ttl);
+                }
+            }
+        }
+        memoriesToRemove.forEach(memories::remove);
+    }
+
+    private void processActiveEffects(NbtCompound entity) {
+        if (!entity.contains(ACTIVE_EFFECTS_KEY)) {
+            return;
+        }
+
+        NbtList activeEffects = entity.getListOrEmpty(ACTIVE_EFFECTS_KEY);
+        Iterator<NbtElement> iterator = activeEffects.iterator();
+
+        while (iterator.hasNext()) {
+            NbtElement element = iterator.next();
+            if (!(element instanceof NbtCompound effectNbt)) continue;
+            int duration = effectNbt.getInt("duration", 0);
+            if (duration <= 0) {
+                iterator.remove();
+                continue;
+            }
+            String effectId = effectNbt.getString(ID_KEY, "");
+            switch (effectId) {
+                case "minecraft:poison":
+                    if (duration % 25 == 0) attack(null, entity, false);
+                    break;
+                case "minecraft:regeneration":
+                    if (duration % 50 == 0) {
+                        float health = entity.getFloat(HEALTH_KEY, 1.0F);
+                        entity.putFloat(HEALTH_KEY, health + 1.0f);
+                    }
+                    break;
+            }
+            duration--;
+            effectNbt.putInt("duration", duration);
+            if (duration <= 0) iterator.remove();
+        }
+        if (activeEffects.isEmpty()) entity.remove(ACTIVE_EFFECTS_KEY);
     }
 }

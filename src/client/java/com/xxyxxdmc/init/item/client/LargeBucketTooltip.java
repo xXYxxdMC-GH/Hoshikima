@@ -63,7 +63,7 @@ public class LargeBucketTooltip {
                                 case 4 -> new Color(134, 144, 245);
                                 default -> new Color(251, 193, 227);
                             };
-                            textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(entityName.copy().withColor(color.getRGB())));
+                            textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(entityName.copy().withColor(color.getRGB())).append(Screen.hasControlDown() ? Text.empty().append(" (❤ × ").append(String.valueOf(entityNbt.getFloat("Health", 1.0F))).append(")") : Text.empty()));
                         } else if (entityNbt.getString("id", "minecraft:cod").equals("minecraft:tropical_fish")) {
                             TropicalFishEntity.Variant variant = entityNbt.get("Variant", TropicalFishEntity.Variant.CODEC).orElse(TropicalFishEntity.DEFAULT_VARIANT);
                             Color baseColor = new Color(variant.baseColor().getMapColor().color);
@@ -71,10 +71,10 @@ public class LargeBucketTooltip {
                             String name = entityName.getString();
                             Text firstWord = Text.of(name.contains(" ") ? name.split(" ")[0] : name.substring(0, name.length() / 2)).copy().withColor(baseColor.getRGB());
                             Text lastWord = Text.of(name.substring(firstWord.getString().length())).copy().withColor(patternColor.getRGB());
-                            textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(firstWord).append(lastWord));
+                            textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(firstWord).append(lastWord).append(Screen.hasControlDown() ? Text.empty().append(" (❤ × ").append(String.valueOf(entityNbt.getFloat("Health", 1.0F))).append(")") : Text.empty()));
                         }
                     } else if (entityNbt.getString("id", "minecraft:cod").equals("hoshikima:empty")) textConsumer.accept(Text.literal("  - ").append(entityName).formatted(Formatting.DARK_GRAY));
-                    else textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(entityName.copy().formatted(Formatting.GRAY)));
+                    else textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(entityName.copy().formatted(Formatting.GRAY)).append(Screen.hasControlDown() ? Text.empty().append(" (❤ × ").append(String.valueOf(entityNbt.getFloat("Health", 1.0F))).append(")") : Text.empty()));
                 }
             } else {
                 textConsumer.accept(Text.translatable("tooltip.hoshikima.entity", size).append(Text.translatable("tooltip.hoshikima.detail")).formatted(Formatting.GRAY));
