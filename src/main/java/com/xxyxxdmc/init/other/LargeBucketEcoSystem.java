@@ -20,18 +20,19 @@ public class LargeBucketEcoSystem {
     private static final String DIED_KEY = "Died";
     private static final String PUFF_STATE_KEY = "PuffState";
     private static final String PUFF_COOLDOWN_KEY = "PuffCooldown";
-    private static final String PUFFERFISH_ATTACK_COOLDOWN_KEY = "AttackCooldown";
+    private static final String ATTACK_COOLDOWN_KEY = "AttackCooldown";
 
     private static final String AXOLOTL_ID = "minecraft:axolotl";
     private static final String PUFFERFISH_ID = "minecraft:pufferfish";
     private static final String HUNTING_COOLDOWN_MEMORY = "minecraft:has_hunting_cooldown";
     private static final String PLAY_DEAD_TICKS_MEMORY = "minecraft:play_dead_ticks";
+    private static final List<String> VICTIMS = List.of("minecraft:cod", "minecraft:salmon", "minecraft:tropical_fish", PUFFERFISH_ID, "minecraft:tadpole");
 
     public static final String EMPTY_ID = "hoshikima:empty";
 
     private static final int TICKS_PER_SECOND = 20;
     private static final int PUFF_UP_COOLDOWN_TICKS = 5 * TICKS_PER_SECOND;
-    private static final int PUFFERFISH_ATTACK_COOLDOWN_TICKS = TICKS_PER_SECOND;
+    private static final int ATTACK_COOLDOWN_TICKS = TICKS_PER_SECOND;
     private static final double MOVE_CHANCE_PER_TICK = 0.05;
 
     private final Random random = new Random();
@@ -101,7 +102,8 @@ public class LargeBucketEcoSystem {
 
         if (emptySlotIndices.isEmpty()) return;
         for (int i = 0; i < slots.size(); i++) {
-            if (!isEmpty(slots.get(i)) && !slots.get(i).getBoolean(DIED_KEY, false) && random.nextDouble() < MOVE_CHANCE_PER_TICK) {
+            if (!isEmpty(slots.get(i)) && !slots.get(i).getBoolean(DIED_KEY, false) && random.nextDouble() < MOVE_CHANCE_PER_TICK && !slots.get(i).getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY).contains(PLAY_DEAD_TICKS_MEMORY)) {
+                if (VICTIMS.contains(slots.get(i).getString("id", "")) && random.nextDouble() > 0.08) continue;
                 int targetEmptyIndex = emptySlotIndices.get(random.nextInt(emptySlotIndices.size()));
                 Collections.swap(slots, i, targetEmptyIndex);
                 emptySlotIndices.remove(Integer.valueOf(targetEmptyIndex));
@@ -116,27 +118,38 @@ public class LargeBucketEcoSystem {
                 .toList();
         if (axolotls.isEmpty()) return;
 
-        List<String> victimIds = List.of("minecraft:cod", "minecraft:salmon", "minecraft:tropical_fish", "minecraft:pufferfish");
         List<NbtCompound> victims = slots.stream()
-                .filter(e -> victimIds.contains(e.getString(ID_KEY, "")) && !e.getBoolean(DIED_KEY, false))
+                .filter(e -> VICTIMS.contains(e.getString(ID_KEY, "")) && !e.getBoolean(DIED_KEY, false))
                 .toList();
-        if (victims.isEmpty()) return;
 
         for (NbtCompound axolotl : axolotls) {
+            processAxolotlState(axolotl);
+            if (victims.isEmpty()) return;
             if (!canAxolotlHunt(axolotl)) continue;
             victims.stream()
                     .findFirst()
                     .ifPresent(target -> {
                         attack(axolotl, target, false);
+                        axolotl.putInt(ATTACK_COOLDOWN_KEY, ATTACK_COOLDOWN_TICKS);
                         if (target.getBoolean(DIED_KEY, false)) processAxolotlState(axolotl, 0);
                     });
+        }
+    }
+
+    private void processAxolotlState(NbtCompound axolotl) {
+        if (axolotl.contains(BRAIN_KEY)) {
+            NbtCompound memories = axolotl.getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY);
+            if (memories.contains(HUNTING_COOLDOWN_MEMORY) && memories.getCompoundOrEmpty(HUNTING_COOLDOWN_MEMORY).getInt("value", 0) <= 0) memories.remove(HUNTING_COOLDOWN_MEMORY);
+            if (memories.contains(PLAY_DEAD_TICKS_MEMORY) && memories.getCompoundOrEmpty(PLAY_DEAD_TICKS_MEMORY).getLong("ttl", 0) <= 0) memories.remove(PLAY_DEAD_TICKS_MEMORY);
         }
     }
 
     private boolean canAxolotlHunt(NbtCompound axolotl) {
         if (axolotl.contains(BRAIN_KEY)) {
             NbtCompound memories = axolotl.getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY);
-            return !memories.contains(HUNTING_COOLDOWN_MEMORY) && !memories.contains(PLAY_DEAD_TICKS_MEMORY);
+            int attackCooldown = axolotl.getInt(ATTACK_COOLDOWN_KEY, 0);
+            if (attackCooldown > 0) axolotl.putInt(ATTACK_COOLDOWN_KEY, attackCooldown - 1);;
+            return !memories.contains(HUNTING_COOLDOWN_MEMORY) && !memories.contains(PLAY_DEAD_TICKS_MEMORY) && attackCooldown <= 0;
         }
         return true;
     }
@@ -153,8 +166,8 @@ public class LargeBucketEcoSystem {
                 pufferfish.putInt(PUFF_COOLDOWN_KEY, cooldown - 1);
             }
 
-            int attackCooldown = pufferfish.getInt(PUFFERFISH_ATTACK_COOLDOWN_KEY, 0);
-            if (attackCooldown > 0) pufferfish.putInt(PUFFERFISH_ATTACK_COOLDOWN_KEY, attackCooldown - 1);
+            int attackCooldown = pufferfish.getInt(ATTACK_COOLDOWN_KEY, 0);
+            if (attackCooldown > 0) pufferfish.putInt(ATTACK_COOLDOWN_KEY, attackCooldown - 1);
 
             NbtCompound leftNeighbor = findNeighbor(slots, i, -1);
             NbtCompound rightNeighbor = findNeighbor(slots, i, 1);
@@ -178,7 +191,7 @@ public class LargeBucketEcoSystem {
                     if (rightIsAxolotl) {
                         attack(pufferfish, rightNeighbor, true);
                     }
-                    pufferfish.putInt(PUFFERFISH_ATTACK_COOLDOWN_KEY, PUFFERFISH_ATTACK_COOLDOWN_TICKS);
+                    pufferfish.putInt(ATTACK_COOLDOWN_KEY, ATTACK_COOLDOWN_TICKS);
                 }
             } else {
                 if (cooldown <= 0 && puffState > 0) {
@@ -214,14 +227,15 @@ public class LargeBucketEcoSystem {
         if (state == 0) {
             NbtCompound cooldown = new NbtCompound();
             cooldown.putBoolean("value", true);
-            cooldown.putLong("ttl", (long) 2 * 60 * 20);
+            cooldown.putLong("ttl", (long) 2 * 60 * TICKS_PER_SECOND);
             memories.put(HUNTING_COOLDOWN_MEMORY, cooldown);
         } else {
             float health = axolotl.getFloat(HEALTH_KEY, 1.0F);
-            if (health <= 7.0F && random.nextFloat() < 0.3333333333333333F) {
+            if (health <= 7.0F && random.nextFloat() < 0.3333333333333333F && !memories.getCompoundOrEmpty("memories").contains(PLAY_DEAD_TICKS_MEMORY)) {
                 NbtCompound playDead = new NbtCompound();
-                playDead.putInt("value", 10 * 20);
+                playDead.putInt("value", 10 * TICKS_PER_SECOND);
                 memories.put(PLAY_DEAD_TICKS_MEMORY, playDead);
+                regenerationAxolotl(axolotl);
             }
         }
     }
@@ -252,7 +266,7 @@ public class LargeBucketEcoSystem {
             victim.putBoolean(DIED_KEY, true);
         }
 
-        if (AXOLOTL_ID.equals(victim.getString(ID_KEY, "")) && victim.getBoolean(DIED_KEY, false)) {
+        if (AXOLOTL_ID.equals(victim.getString(ID_KEY, "")) && !victim.getBoolean(DIED_KEY, false)) {
             processAxolotlState(victim, 1);
         }
     }
@@ -270,12 +284,31 @@ public class LargeBucketEcoSystem {
         );
 
         NbtCompound poison = new NbtCompound();
-        poison.putString("id", "minecraft:poison");
+        poison.putString(ID_KEY, "minecraft:poison");
         poison.putInt("duration", duration);
         poison.putByte("amplifier", (byte) 0);
         poison.putBoolean("show_icon", true);
         activeEffects.add(poison);
-        victim.put("active_effects", activeEffects);
+        victim.put(ACTIVE_EFFECTS_KEY, activeEffects);
+    }
+
+    public void regenerationAxolotl(NbtCompound axolotl) {
+        NbtList activeEffects = axolotl.getListOrEmpty(ACTIVE_EFFECTS_KEY).copy();
+        if (!axolotl.contains(ACTIVE_EFFECTS_KEY)) {
+            axolotl.put(ACTIVE_EFFECTS_KEY, activeEffects);
+        }
+
+        activeEffects.removeIf(element ->
+                element instanceof NbtCompound compound && "minecraft:regeneration".equals(compound.getString(ID_KEY, ""))
+        );
+
+        NbtCompound poison = new NbtCompound();
+        poison.putString(ID_KEY, "minecraft:regeneration");
+        poison.putInt("duration", 10 * TICKS_PER_SECOND);
+        poison.putByte("amplifier", (byte) 0);
+        poison.putBoolean("show_icon", true);
+        activeEffects.add(poison);
+        axolotl.put(ACTIVE_EFFECTS_KEY, activeEffects);
     }
 
     private ClearResult cleanupDeadEntities(List<NbtCompound> slots) {
@@ -343,12 +376,18 @@ public class LargeBucketEcoSystem {
             String effectId = effectNbt.getString(ID_KEY, "");
             switch (effectId) {
                 case "minecraft:poison":
-                    if (duration % 25 == 0) attack(null, entity, false);
+                    if (duration % 25 == 0 && entity.getFloat("Health", 1.0F) >= 2.0F) attack(null, entity, false);
                     break;
                 case "minecraft:regeneration":
                     if (duration % 50 == 0) {
                         float health = entity.getFloat(HEALTH_KEY, 1.0F);
-                        entity.putFloat(HEALTH_KEY, health + 1.0f);
+                        if (health + 1.0F <= 14.0F) entity.putFloat(HEALTH_KEY, health + 1.0F);
+                        if (entity.getString(ID_KEY, "").equals(AXOLOTL_ID) && entity.getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY).contains(PLAY_DEAD_TICKS_MEMORY)) {
+                            NbtCompound memories = entity.getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY).getCompoundOrEmpty(PLAY_DEAD_TICKS_MEMORY);
+                            int playDeadTicks = memories.getInt("value", 0);
+                            if (playDeadTicks - 50 > 0) memories.putInt("value", playDeadTicks - 50);
+                            else memories.remove(PLAY_DEAD_TICKS_MEMORY);
+                        }
                     }
                     break;
             }

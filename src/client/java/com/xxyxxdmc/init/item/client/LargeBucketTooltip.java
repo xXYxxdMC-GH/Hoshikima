@@ -63,7 +63,7 @@ public class LargeBucketTooltip {
                                 case 4 -> new Color(134, 144, 245);
                                 default -> new Color(251, 193, 227);
                             };
-                            textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(entityName.copy().withColor(color.getRGB())).append(Screen.hasControlDown() ? Text.empty().append(" (❤ × ").append(String.valueOf(entityNbt.getFloat("Health", 1.0F))).append(")") : Text.empty()));
+                            textConsumer.accept(Text.literal("  - ").formatted(Formatting.DARK_GRAY).append(entityName.copy().withColor(color.getRGB())).append(Screen.hasControlDown() ? Text.empty().append(" (❤ × ").append(String.valueOf(entityNbt.getFloat("Health", 1.0F))).append(")").append((entityNbt.getListOrEmpty("active_effects").toString().contains("minecraft:poison")) ? Text.of(" (💀)").copy().withColor(new Color(33, 141, 0).getRGB()) : Text.empty()).append((entityNbt.getListOrEmpty("active_effects").toString().contains("minecraft:regeneration")) ? Text.of(" (❤)").copy().withColor(new Color(255, 114, 114).getRGB()) : Text.empty()) : Text.empty()));
                         } else if (entityNbt.getString("id", "minecraft:cod").equals("minecraft:tropical_fish")) {
                             TropicalFishEntity.Variant variant = entityNbt.get("Variant", TropicalFishEntity.Variant.CODEC).orElse(TropicalFishEntity.DEFAULT_VARIANT);
                             Color baseColor = new Color(variant.baseColor().getMapColor().color);
