@@ -393,7 +393,10 @@ public class LargeBucketEcoSystem {
             }
             duration--;
             effectNbt.putInt("duration", duration);
-            if (duration <= 0) iterator.remove();
+            if (duration <= 0) {
+                if (effectId.equals("minecraft:regeneration") && entity.getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY).contains(PLAY_DEAD_TICKS_MEMORY)) entity.getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY).remove(PLAY_DEAD_TICKS_MEMORY);
+                iterator.remove();
+            }
         }
         if (activeEffects.isEmpty()) entity.remove(ACTIVE_EFFECTS_KEY);
     }
