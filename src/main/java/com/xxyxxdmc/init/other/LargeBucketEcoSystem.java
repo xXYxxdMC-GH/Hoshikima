@@ -139,16 +139,17 @@ public class LargeBucketEcoSystem {
     private void processAxolotlState(NbtCompound axolotl) {
         if (axolotl.contains(BRAIN_KEY)) {
             NbtCompound memories = axolotl.getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY);
-            if (memories.contains(HUNTING_COOLDOWN_MEMORY) && memories.getCompoundOrEmpty(HUNTING_COOLDOWN_MEMORY).getInt("value", 0) <= 0) memories.remove(HUNTING_COOLDOWN_MEMORY);
-            if (memories.contains(PLAY_DEAD_TICKS_MEMORY) && memories.getCompoundOrEmpty(PLAY_DEAD_TICKS_MEMORY).getLong("ttl", 0) <= 0) memories.remove(PLAY_DEAD_TICKS_MEMORY);
+            if (memories.contains(HUNTING_COOLDOWN_MEMORY) && memories.getCompoundOrEmpty(HUNTING_COOLDOWN_MEMORY).getLong("ttl", 0) <= 0) memories.remove(HUNTING_COOLDOWN_MEMORY);
+            if (memories.contains(PLAY_DEAD_TICKS_MEMORY) && memories.getCompoundOrEmpty(PLAY_DEAD_TICKS_MEMORY).getInt("value", 0) <= 0) memories.remove(PLAY_DEAD_TICKS_MEMORY);
         }
+        int attackCooldown = axolotl.getInt(ATTACK_COOLDOWN_KEY, 0);
+        if (attackCooldown > 0) axolotl.putInt(ATTACK_COOLDOWN_KEY, attackCooldown - 1);
     }
 
     private boolean canAxolotlHunt(NbtCompound axolotl) {
         if (axolotl.contains(BRAIN_KEY)) {
             NbtCompound memories = axolotl.getCompoundOrEmpty(BRAIN_KEY).getCompoundOrEmpty(MEMORIES_KEY);
             int attackCooldown = axolotl.getInt(ATTACK_COOLDOWN_KEY, 0);
-            if (attackCooldown > 0) axolotl.putInt(ATTACK_COOLDOWN_KEY, attackCooldown - 1);
             return !memories.contains(HUNTING_COOLDOWN_MEMORY) && !memories.contains(PLAY_DEAD_TICKS_MEMORY) && attackCooldown <= 0;
         }
         return true;
