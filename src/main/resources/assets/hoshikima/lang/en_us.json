@@ -21,5 +21,6 @@
   "tooltip.hoshikima.spare": "Spare",
   "tooltip.hoshikima.state": "State",
   "tooltip.hoshikima.entity": "Have %d entities in total",
-  "tooltip.hoshikima.detail": "(Press SHIFT to see details)"
+  "tooltip.hoshikima.detail": "(Press SHIFT to see details)",
+  "config.hoshikima.title": "Hoshikima Mod Configuration"
 }
