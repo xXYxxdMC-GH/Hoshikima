@@ -4,23 +4,33 @@ import com.xxyxxdmc.config.HoshikimaConfig;
 import com.xxyxxdmc.init.ModDataComponents;
 import com.xxyxxdmc.init.ModEnchantments;
 import com.xxyxxdmc.init.ModItem;
+import com.xxyxxdmc.init.callback.IChainMineState;
 import com.xxyxxdmc.init.callback.ItemPickupCallback;
 import com.xxyxxdmc.init.recipe.ModRecipe;
+import com.xxyxxdmc.networking.payload.ChainMineKeyPressPayload;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Identifier;
 
 import static com.xxyxxdmc.init.ModDataComponents.COUNT;
 
 public class Hoshikima implements ModInitializer {
 	public static final String MOD_ID = "hoshikima";
+	public static final Identifier CHAIN_MINE_PACKET_ID = Identifier.of(MOD_ID, "chain_mine_key_state");
 
 	@Override
 	public void onInitialize() {
 		HoshikimaConfig config = HoshikimaConfig.get();
-		if (true) {
+		if (config.enableEnderPearlBundle) {
 			ModItem.EnderPearlBundleRegister.initialize();
 			ItemPickupCallback.EVENT.register((player, itemEntity, pickedStack) -> {
 				if (pickedStack.getItem() != Items.ENDER_PEARL || player.getWorld().isClient) {
@@ -61,6 +71,26 @@ public class Hoshikima implements ModInitializer {
 		if (config.enableFireworkThruster) ModItem.FireworkThrusterRegister.initialize();
 		if (config.enableMultiFluidBucket) ModItem.MultiFluidBucketRegister.initialize();
 		if (config.enableRottenFleshCluster) ModItem.RottenFleshClusterRegister.initialize();
+
+		PayloadTypeRegistry.playC2S().register(ChainMineKeyPressPayload.ID, ChainMineKeyPressPayload.CODEC);
+
+		ServerPlayNetworking.registerGlobalReceiver(ChainMineKeyPressPayload.ID, (payload, context) -> {
+			boolean isActive = payload.isPressed();
+			context.server().execute(() -> {
+				((IChainMineState) context.player()).hoshikima_setChainMiningActive(isActive);
+			});
+		});
+
+		// TODO: Add Data pack in mod.
+		// var modContainer = FabricLoader.getInstance()
+		// 		 .getModContainer(MOD_ID)
+		// 		 .orElseThrow(() -> new IllegalStateException("Could not find mod container for " + MOD_ID));
+		// ResourceManagerHelper.registerBuiltinResourcePack(
+		// 		 Identifier.of(MOD_ID, "hoshikima_raw_ore_recipe_data"),
+		// 		 modContainer,
+		// 		 Text.translatable("datapack.hoshikima.name"),
+		// 		 ResourcePackActivationType.DEFAULT_ENABLED
+		// );
 	}
 	private void tryAbsorbPearls(ItemStack remainingStack, ItemStack bundleStack) {
 		if (remainingStack.isEmpty() || bundleStack.getItem() != ModItem.EnderPearlBundleRegister.ENDER_PEARL_BUNDLE) {

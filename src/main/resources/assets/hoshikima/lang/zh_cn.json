@@ -21,5 +21,15 @@
   "tooltip.hoshikima.spare": "备用",
   "tooltip.hoshikima.state": "状态",
   "tooltip.hoshikima.entity": "总共有 %d 个实体",
-  "tooltip.hoshikima.detail": "(按 SHIFT 键查看详情)"
+  "tooltip.hoshikima.detail": "(按 SHIFT 键查看详情)",
+  "config.hoshikima.title": "配置",
+  "config.hoshikima.restart_required": "部分配置更改需要重启游戏才能完全生效。",
+  "config.hoshikima.category.items": "物品设置",
+  "config.hoshikima.category.features": "功能设置",
+  "config.hoshikima.category.features.empty": "暂无可用功能性设置。",
+  "config.hoshikima.category.items.tooltip": "配置模组物品的注册",
+  "config.hoshikima.category.features.tooltip": "模组内功能的设置与调节",
+  "datapack.hoshikima.name": "粗矿块冶炼配方",
+  "key.hoshikima.chain_mine": "连锁采集",
+  "key.category.hoshikima": "Hoshikima"
 }

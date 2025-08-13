@@ -13,7 +13,6 @@ import net.minecraft.recipe.book.RecipeCategory;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.RegistryWrapper;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class HoshikimaRecipeProvider extends FabricRecipeProvider {
@@ -28,54 +27,6 @@ public class HoshikimaRecipeProvider extends FabricRecipeProvider {
             @Override
             public void generate() {
                 RegistryWrapper.Impl<Item> itemLookup = registries.getOrThrow(RegistryKeys.ITEM);
-                offerBlasting(
-                        List.of(Items.RAW_COPPER_BLOCK),
-                        RecipeCategory.MISC,
-                        Items.COPPER_BLOCK,
-                        6.3f,
-                        900,
-                        "ore_block_blast"
-                );
-                offerBlasting(
-                        List.of(Items.RAW_IRON_BLOCK),
-                        RecipeCategory.MISC,
-                        Items.IRON_BLOCK,
-                        6.3f,
-                        900,
-                        "ore_block_blast"
-                );
-                offerBlasting(
-                        List.of(Items.RAW_GOLD_BLOCK),
-                        RecipeCategory.MISC,
-                        Items.GOLD_BLOCK,
-                        6.3f,
-                        900,
-                        "ore_block_blast"
-                );
-                offerSmelting(
-                        List.of(Items.RAW_COPPER_BLOCK),
-                        RecipeCategory.MISC,
-                        Items.COPPER_BLOCK,
-                        6.3f,
-                        900,
-                        "ore_block_blast"
-                );
-                offerSmelting(
-                        List.of(Items.RAW_IRON_BLOCK),
-                        RecipeCategory.MISC,
-                        Items.IRON_BLOCK,
-                        6.3f,
-                        900,
-                        "ore_block_blast"
-                );
-                offerSmelting(
-                        List.of(Items.RAW_GOLD_BLOCK),
-                        RecipeCategory.MISC,
-                        Items.GOLD_BLOCK,
-                        6.3f,
-                        900,
-                        "ore_block_blast"
-                );
                 createShaped(RecipeCategory.TOOLS, ModItem.EnderPearlBundleRegister.ENDER_PEARL_BUNDLE, 1)
                         .pattern("#C#")
                         .pattern("DBD")

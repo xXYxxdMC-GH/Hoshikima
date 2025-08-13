@@ -6,7 +6,9 @@
 		"ItemEntityMixin",
 		"FireworkAccessor",
 		"AxolotlEntityMixin",
-		"FishEntityMixin"
+		"FishEntityMixin",
+		"BlockMixin",
+		"ServerPlayerInteractionManagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

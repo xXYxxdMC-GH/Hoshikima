@@ -26,7 +26,24 @@ public class HoshikimaConfig {
     public boolean enableMultiFluidBucket = true;
     public boolean enableRottenFleshCluster = true;
 
-    private HoshikimaConfig() {}
+    public HoshikimaConfig() {}
+
+    public HoshikimaConfig(HoshikimaConfig other) {
+        this.enableEnderPearlBundle = other.enableEnderPearlBundle;
+        this.enableFireworkThruster = other.enableFireworkThruster;
+        this.enableLargeBucket = other.enableLargeBucket;
+        this.enableMultiFluidBucket = other.enableMultiFluidBucket;
+        this.enableRottenFleshCluster = other.enableRottenFleshCluster;
+    }
+
+    public void apply(HoshikimaConfig other) {
+        this.enableEnderPearlBundle = other.enableEnderPearlBundle;
+        this.enableFireworkThruster = other.enableFireworkThruster;
+        this.enableLargeBucket = other.enableLargeBucket;
+        this.enableMultiFluidBucket = other.enableMultiFluidBucket;
+        this.enableRottenFleshCluster = other.enableRottenFleshCluster;
+    }
+
 
     public static synchronized HoshikimaConfig get() {
         if (INSTANCE == null) {
@@ -40,9 +57,7 @@ public class HoshikimaConfig {
         if (CONFIG_FILE.exists() && CONFIG_FILE.isFile()) {
             try (FileReader reader = new FileReader(CONFIG_FILE)) {
                 config = GSON.fromJson(reader, HoshikimaConfig.class);
-                if (config == null) {
-                    throw new IOException("Parsed config was null, file might be empty or corrupted.");
-                }
+                if (config == null) config = new HoshikimaConfig();
             } catch (Exception e) {
                 LOGGER.error("Failed to load config file, creating a new one with default values.", e);
                 config = new HoshikimaConfig();

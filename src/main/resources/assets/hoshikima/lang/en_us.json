@@ -22,6 +22,14 @@
   "tooltip.hoshikima.state": "State",
   "tooltip.hoshikima.entity": "Have %d entities in total",
   "tooltip.hoshikima.detail": "(Press SHIFT to see details)",
-  "config.hoshikima.title": "Hoshikima Mod Configuration",
-  "config.hoshikima.restart_required": "Configuration changes require a game restart to take full effect."
+  "config.hoshikima.title": "Configuration",
+  "config.hoshikima.restart_required": "Configuration changes require a game restart to take full effect.",
+  "config.hoshikima.category.items": "Item Settings",
+  "config.hoshikima.category.features": "Feature Settings",
+  "config.hoshikima.category.features.empty": "No feature-specific settings available yet.",
+  "config.hoshikima.category.items.tooltip": "Configure the registration of mod items.",
+  "config.hoshikima.category.features.tooltip": "Configure and adjust the features within the mod.",
+  "datapack.hoshikima.name": "Raw Ore Block Smelting Recipe",
+  "key.hoshikima.chain_mine": "Chain Mine",
+  "key.category.hoshikima": "Hoshikima"
 }
