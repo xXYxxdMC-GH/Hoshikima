@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "minecraft:ender_eye",
+    "B": "minecraft:bundle",
+    "C": "minecraft:ender_chest",
+    "D": "minecraft:diamond",
+    "E": "minecraft:ender_pearl"
+  },
+  "pattern": [
+    "#C#",
+    "DBD",
+    "EEE"
+  ],
+  "result": {
+    "count": 1,
+    "id": "hoshikima:ender_pearl_bundle"
+  }
+}

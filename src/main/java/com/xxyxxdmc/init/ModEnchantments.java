@@ -13,6 +13,6 @@ public class ModEnchantments {
         return RegistryKey.of(RegistryKeys.ENCHANTMENT, id);
     }
     @SuppressWarnings("EmptyMethod")
-    public static void registerModEnchantmentEffects() {
+    public static void registerModEnchantment() {
     }
 }

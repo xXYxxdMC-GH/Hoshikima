@@ -22,5 +22,6 @@
   "tooltip.hoshikima.state": "State",
   "tooltip.hoshikima.entity": "Have %d entities in total",
   "tooltip.hoshikima.detail": "(Press SHIFT to see details)",
-  "config.hoshikima.title": "Hoshikima Mod Configuration"
+  "config.hoshikima.title": "Hoshikima Mod Configuration",
+  "config.hoshikima.restart_required": "Configuration changes require a game restart to take full effect."
 }

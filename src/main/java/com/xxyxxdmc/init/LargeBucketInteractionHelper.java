@@ -21,7 +21,7 @@ public class LargeBucketInteractionHelper {
     public static ActionResult tryPickup(LivingEntity entity, PlayerEntity player, Hand hand, SoundEvent pickupSound) {
         ItemStack stack = player.getStackInHand(hand);
 
-        boolean canPickup = stack.isOf(ModItem.LARGE_BUCKET)
+        boolean canPickup = stack.isOf(ModItem.LargeBucketRegister.LARGE_BUCKET)
                 && stack.getOrDefault(FLUID_TYPE, 0) == 1
                 && stack.getOrDefault(MODE, 1) == 1
                 && stack.getOrDefault(WATER_CAPACITY, 0) > stack.getOrDefault(ENTITIES_SIZE, 0);
