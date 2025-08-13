@@ -1,5 +1,6 @@
 package com.xxyxxdmc.mixin;
 
+import com.xxyxxdmc.init.callback.IChainMineState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
@@ -42,11 +43,15 @@ public abstract class ServerPlayerInteractionManagerMixin {
 
     @Inject(
             method = "tryBreakBlock",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/block/Block;onBreak(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/entity/player/PlayerEntity;)Z", shift = At.Shift.AFTER)
+            at = @At("TAIL")
     )
     private void onBlockBroken(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if (!cir.getReturnValue()) {
+            return;
+        }
 
-        if (this.player.isSneaking()) {
+        IChainMineState playerState = (IChainMineState) this.player;
+        if (!playerState.hoshikima_isChainMiningActive()) {
             return;
         }
 
