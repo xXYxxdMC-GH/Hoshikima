@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.xxyxxdmc.Hoshikima;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HoshikimaConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger("HoshikimaConfig");
@@ -24,7 +27,8 @@ public class HoshikimaConfig {
     public boolean enableFireworkThruster = true;
     public boolean enableLargeBucket = true;
     public boolean enableMultiFluidBucket = true;
-    public boolean enableRottenFleshCluster = true;
+    public boolean enableRottenFleshCluster = false;
+    public List<Block> chainableBlocks = new ArrayList<>();
 
     public HoshikimaConfig() {}
 
@@ -34,6 +38,7 @@ public class HoshikimaConfig {
         this.enableLargeBucket = other.enableLargeBucket;
         this.enableMultiFluidBucket = other.enableMultiFluidBucket;
         this.enableRottenFleshCluster = other.enableRottenFleshCluster;
+        this.chainableBlocks = new ArrayList<>(other.chainableBlocks);
     }
 
     public void apply(HoshikimaConfig other) {
@@ -42,8 +47,8 @@ public class HoshikimaConfig {
         this.enableLargeBucket = other.enableLargeBucket;
         this.enableMultiFluidBucket = other.enableMultiFluidBucket;
         this.enableRottenFleshCluster = other.enableRottenFleshCluster;
+        this.chainableBlocks = new ArrayList<>(other.chainableBlocks);
     }
-
 
     public static synchronized HoshikimaConfig get() {
         if (INSTANCE == null) {
