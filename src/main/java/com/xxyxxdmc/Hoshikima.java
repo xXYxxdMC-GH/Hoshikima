@@ -8,6 +8,7 @@ import com.xxyxxdmc.init.callback.IChainMineState;
 import com.xxyxxdmc.init.callback.ItemPickupCallback;
 import com.xxyxxdmc.init.recipe.ModRecipe;
 import com.xxyxxdmc.networking.payload.ChainMineKeyPressPayload;
+import com.xxyxxdmc.networking.payload.ModMessages;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -20,12 +21,18 @@ import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
+import org.apache.commons.logging.Log;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 import static com.xxyxxdmc.init.ModDataComponents.COUNT;
 
 public class Hoshikima implements ModInitializer {
 	public static final String MOD_ID = "hoshikima";
 	public static final Identifier CHAIN_MINE_PACKET_ID = Identifier.of(MOD_ID, "chain_mine_key_state");
+	public static final Logger LOGGER = Logger.getLogger("Hoshikima");
 
 	@Override
 	public void onInitialize() {
@@ -72,14 +79,8 @@ public class Hoshikima implements ModInitializer {
 		if (config.enableMultiFluidBucket) ModItem.MultiFluidBucketRegister.initialize();
 		if (config.enableRottenFleshCluster) ModItem.RottenFleshClusterRegister.initialize();
 
-		PayloadTypeRegistry.playC2S().register(ChainMineKeyPressPayload.ID, ChainMineKeyPressPayload.CODEC);
-
-		ServerPlayNetworking.registerGlobalReceiver(ChainMineKeyPressPayload.ID, (payload, context) -> {
-			boolean isActive = payload.isPressed();
-			context.server().execute(() -> {
-				((IChainMineState) context.player()).hoshikima_setChainMiningActive(isActive);
-			});
-		});
+		ModMessages.registerC2SPayloads();
+		ModMessages.registerS2CPayloads();
 
 		// TODO: Add Data pack in mod.
 		// var modContainer = FabricLoader.getInstance()

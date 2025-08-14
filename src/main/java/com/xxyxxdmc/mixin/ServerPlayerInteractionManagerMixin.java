@@ -1,125 +1,109 @@
 package com.xxyxxdmc.mixin;
 
+import com.xxyxxdmc.function.ChainMineState;
 import com.xxyxxdmc.init.callback.IChainMineState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 @Mixin(ServerPlayerInteractionManager.class)
 public abstract class ServerPlayerInteractionManagerMixin {
 
-    @Shadow public ServerPlayerEntity player;
-    @Shadow public ServerWorld world;
+    @Shadow private ServerPlayerEntity player;
+    @Shadow private ServerWorld world;
 
     private static final int MAX_BLOCKS_TO_BREAK = 128;
 
-    private static final ThreadLocal<Boolean> isChainMining = ThreadLocal.withInitial(() -> false);
-    private static final ThreadLocal<List<ItemStack>> capturedDrops = ThreadLocal.withInitial(ArrayList::new);
-
-    public static boolean isChainMining() {
-        return isChainMining.get();
-    }
-
-    public static void captureDrop(ItemStack stack) {
-        capturedDrops.get().add(stack);
-    }
-
-    @Inject(
+    @Redirect(
             method = "tryBreakBlock",
-            at = @At("TAIL")
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/block/Block;afterBreak(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/entity/BlockEntity;Lnet/minecraft/item/ItemStack;)V"
+            )
     )
-    private void onBlockBroken(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (!cir.getReturnValue()) {
-            return;
-        }
-
+    private void onAfterBlockBroken(Block instance, World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack tool) {
         IChainMineState playerState = (IChainMineState) this.player;
-        if (!playerState.hoshikima_isChainMiningActive()) {
+        if (!playerState.isChainMiningActive()) {
+            instance.afterBreak(world, player, pos, state, blockEntity, tool);
             return;
         }
 
-        BlockState originalState = this.world.getBlockState(pos);
-        Block originalBlock = originalState.getBlock();
+        Block originalBlock = state.getBlock();
 
-        boolean isChainable = originalState.isIn(BlockTags.LOGS) ||
-                originalState.isIn(BlockTags.COAL_ORES) ||
-                originalState.isIn(BlockTags.IRON_ORES) ||
-                originalState.isIn(BlockTags.COPPER_ORES) ||
-                originalState.isIn(BlockTags.GOLD_ORES) ||
-                originalState.isIn(BlockTags.REDSTONE_ORES) ||
-                originalState.isIn(BlockTags.LAPIS_ORES) ||
-                originalState.isIn(BlockTags.DIAMOND_ORES) ||
-                originalState.isIn(BlockTags.EMERALD_ORES);
-
-        if (!isChainable) {
-            return;
-        }
-
-        isChainMining.set(true);
-        capturedDrops.get().clear();
+        ChainMineState.setChainMining(true);
+        ChainMineState.clearCapturedDrops();
+        ChainMineState.clearCapturedXp();
         try {
             findAndBreakConnectedBlocks(pos, originalBlock);
         } finally {
-            for (ItemStack drop : capturedDrops.get()) {
-                if (!this.player.getInventory().insertStack(drop)) {
-                    Block.dropStack(this.world, pos, drop);
-                }
+            ChainMineState.setChainMining(false);
+            for (ItemStack drop : ChainMineState.getCapturedDrops()) {
+                Block.dropStack(this.world, pos, drop);
             }
-            isChainMining.set(false);
-            capturedDrops.get().clear();
+            int totalXp = ChainMineState.getCapturedXp();
+            if (totalXp > 0) {
+                ExperienceOrbEntity.spawn(this.world, pos.toCenterPos(), totalXp);
+            }
+            ChainMineState.clearCapturedDrops();
+            ChainMineState.clearCapturedXp();
         }
     }
 
     private void findAndBreakConnectedBlocks(BlockPos startPos, Block originalBlock) {
-        Queue<BlockPos> blocksToVisit = new LinkedList<>();
-        Set<BlockPos> visited = new HashSet<>();
-
-        blocksToVisit.add(startPos);
-        visited.add(startPos);
+        List<BlockPos> blocksToBreak = findConnectedBlocks(startPos, originalBlock);
 
         int blocksBroken = 0;
         ItemStack mainHandStack = this.player.getMainHandStack();
 
-        blocksToVisit.poll();
+        for (BlockPos currentPos : blocksToBreak) {
+            if (blocksBroken >= MAX_BLOCKS_TO_BREAK) break;
+
+            if (mainHandStack.isDamageable() && mainHandStack.getDamage() >= mainHandStack.getMaxDamage() - 1) {
+                break;
+            }
+
+            this.world.breakBlock(currentPos, true, this.player);
+
+            if (!this.player.isCreative()) {
+                mainHandStack.postMine(this.world, this.world.getBlockState(currentPos), currentPos, this.player);
+            }
+            blocksBroken++;
+        }
+    }
+
+    private List<BlockPos> findConnectedBlocks(BlockPos startPos, Block originalBlock) {
+        List<BlockPos> foundBlocks = new ArrayList<>();
+        Queue<BlockPos> blocksToVisit = new LinkedList<>();
+        Set<BlockPos> visited = new HashSet<>();
 
         addNeighborsToQueue(startPos, blocksToVisit, visited);
 
-        while (!blocksToVisit.isEmpty() && blocksBroken < MAX_BLOCKS_TO_BREAK) {
+        while (!blocksToVisit.isEmpty() && foundBlocks.size() < MAX_BLOCKS_TO_BREAK) {
             BlockPos currentPos = blocksToVisit.poll();
 
             if (this.world.getBlockState(currentPos).isOf(originalBlock)) {
-                if (mainHandStack.isDamageable() && mainHandStack.getDamage() >= mainHandStack.getMaxDamage() - 1) {
-                    break;
-                }
-
-                this.world.breakBlock(currentPos, true, this.player);
-
-                if (!this.player.isCreative()) {
-                    mainHandStack.postMine(this.world, this.world.getBlockState(currentPos), currentPos, this.player);
-                }
-
-                blocksBroken++;
+                foundBlocks.add(currentPos);
                 addNeighborsToQueue(currentPos, blocksToVisit, visited);
             }
         }
+        return foundBlocks;
     }
+
 
     private void addNeighborsToQueue(BlockPos pos, Queue<BlockPos> queue, Set<BlockPos> visited) {
         for (int x = -1; x <= 1; x++) {

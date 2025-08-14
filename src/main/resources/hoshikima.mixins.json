@@ -8,6 +8,7 @@
 		"AxolotlEntityMixin",
 		"FishEntityMixin",
 		"BlockMixin",
+		"ServerPlayerEntityMixin",
 		"ServerPlayerInteractionManagerMixin"
 	],
 	"injectors": {
