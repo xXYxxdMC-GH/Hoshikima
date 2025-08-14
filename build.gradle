@@ -25,12 +25,12 @@ repositories {
 loom {
 	splitEnvironmentSourceSets()
 
-	//mods {
-	//	"hoshikima" {
-	//		sourceSet sourceSets.main
-	//		sourceSet sourceSets.client
-	//	}
-	//}
+	mods {
+		"hoshikima" {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
 
 }
 
