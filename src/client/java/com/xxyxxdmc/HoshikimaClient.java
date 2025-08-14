@@ -35,15 +35,16 @@ public class HoshikimaClient implements ClientModInitializer {
 		if (client.player == null || client.world == null) {
 			return;
 		}
-
 		boolean isChainKeyDown = HoshikimaKeyBind.CHAIN_MINE_KEY.isPressed();
-
 		if (isChainKeyDown != wasChainMineKeyPressed) {
 			ClientPlayNetworking.send(new ChainMineKeyPressPayload(isChainKeyDown));
 			wasChainMineKeyPressed = isChainKeyDown;
 		}
-
-		if (!isChainKeyDown) {
+		BlockPos targetPos = null;
+		if (isChainKeyDown && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+			targetPos = ((BlockHitResult) client.crosshairTarget).getBlockPos();
+		}
+		if (targetPos == null) {
 			if (lastQueriedPos != null) {
 				ChainMineOutlineRenderer.clear();
 				lastQueriedPos = null;
@@ -51,23 +52,9 @@ public class HoshikimaClient implements ClientModInitializer {
 			return;
 		}
 
-
-		HitResult hit = client.crosshairTarget;
-		if (hit == null || hit.getType() != HitResult.Type.BLOCK) {
-			if (lastQueriedPos != null) {
-				ChainMineOutlineRenderer.clear();
-				lastQueriedPos = null;
-			}
-			return;
+		if (!targetPos.equals(lastQueriedPos)) {
+			lastQueriedPos = targetPos;
+			ClientPlayNetworking.send(new QueryChainMineBlocksPacket(targetPos));
 		}
-
-		BlockPos currentPos = ((BlockHitResult) hit).getBlockPos();
-
-		if (currentPos.equals(lastQueriedPos)) {
-			return;
-		}
-
-		lastQueriedPos = currentPos;
-		ClientPlayNetworking.send(new QueryChainMineBlocksPacket(currentPos));
 	}
 }
