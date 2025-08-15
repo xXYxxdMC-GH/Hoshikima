@@ -1,10 +1,12 @@
 package com.xxyxxdmc.networking.payload;
 
 import com.xxyxxdmc.config.HoshikimaConfig;
+import com.xxyxxdmc.init.callback.IChainMineState;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.*;
@@ -14,6 +16,17 @@ public class ModMessages {
         PayloadTypeRegistry.playC2S().register(ChainMineKeyPressPayload.ID, ChainMineKeyPressPayload.CODEC);
 
         PayloadTypeRegistry.playC2S().register(QueryChainMineBlocksPacket.ID, QueryChainMineBlocksPacket.CODEC);
+
+        ServerPlayNetworking.registerGlobalReceiver(ChainMineKeyPressPayload.ID, (payload, context) -> {
+            ServerPlayerEntity player = context.player();
+            boolean isPressed = payload.isPressed();
+
+            context.server().execute(() -> {
+                IChainMineState playerState = (IChainMineState) player;
+                playerState.setChainMiningActive(isPressed);
+            });
+        });
+
 
         ServerPlayNetworking.registerGlobalReceiver(QueryChainMineBlocksPacket.ID, (payload, context) -> {
             context.server().execute(() -> {
