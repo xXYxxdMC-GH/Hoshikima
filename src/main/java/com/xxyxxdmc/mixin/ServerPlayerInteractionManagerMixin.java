@@ -40,10 +40,13 @@ public abstract class ServerPlayerInteractionManagerMixin {
         IChainMineState playerState = (IChainMineState) this.player;
         if (!playerState.isChainMiningActive()) {
             instance.afterBreak(world, player, pos, state, blockEntity, tool);
+            System.out.println("Action has been blocked by Chain not active.");
             return;
         }
 
         Block originalBlock = state.getBlock();
+
+        System.out.println(originalBlock.toString());
 
         ChainMineState.setChainMining(true);
         ChainMineState.clearCapturedDrops();
