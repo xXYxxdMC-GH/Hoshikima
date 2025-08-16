@@ -160,7 +160,7 @@ public abstract class ServerPlayerInteractionManagerMixin {
         }
     }
 
-    public static Direction getTargetedFace(World world, PlayerEntity player) {
+    private static Direction getTargetedFace(World world, PlayerEntity player) {
         Vec3d eyePos = player.getEyePos();
         Vec3d lookVec = player.getRotationVec(1.0F);
         Vec3d reachEnd = eyePos.add(lookVec.multiply(player.getAttributes().getValue(EntityAttributes.BLOCK_INTERACTION_RANGE)));
