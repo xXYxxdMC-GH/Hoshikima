@@ -9,7 +9,8 @@
 	],
 	"contact": {
 		"homepage": "https://github.com/xXYxxdMC-GH",
-		"sources": "https://github.com/xXYxxdMC-GH/Hoshikima"
+		"sources": "https://github.com/xXYxxdMC-GH/Hoshikima",
+		"issues": "https://github.com/xXYxxdMC-GH/Hoshikima/issues"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/hoshikima/icon.png",
