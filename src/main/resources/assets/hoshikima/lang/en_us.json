@@ -30,6 +30,7 @@
   "config.hoshikima.chain.mine.chain.mode": "Chain Mode",
   "config.hoshikima.chain.mine.mode.one": "Shapeless",
   "config.hoshikima.chain.mine.mode.two": "Single block tunnel",
+  "config.hoshikima.category.other": "Other Settings",
   "config.hoshikima.category.features.empty": "No feature-specific settings available yet.",
   "config.hoshikima.category.items.tooltip": "Configure the registration of mod items.",
   "config.hoshikima.category.features.tooltip": "Configure and adjust the features within the mod.",

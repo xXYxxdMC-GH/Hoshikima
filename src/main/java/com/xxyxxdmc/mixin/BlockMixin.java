@@ -26,15 +26,14 @@ public class BlockMixin {
     }
     @Inject(
         method = "dropExperienceWhenMined",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/block/Block;dropExperience(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;I)V"
-        ),
+        at = @At(value = "HEAD"),
         cancellable = true
     )
-    private static void onDropExperience(ServerWorld world, BlockPos pos, ItemStack stack, int amount, CallbackInfo ci) {
+    private static void onDropExperience(ServerWorld world, BlockPos pos, ItemStack stack, IntProvider intProvider, CallbackInfo ci) {
         if (ChainMineState.isChainMining()) {
-            ChainMineState.addCapturedXp(amount);
+            int experienceAmount = intProvider.get(world.getRandom());
+    experienceAmount = EnchantmentHelper.getBlockExperience(world, stack, experienceAmount);
+            ChainMineState.addCapturedXp(experienceAmount);
             ci.cancel();
         }
     }

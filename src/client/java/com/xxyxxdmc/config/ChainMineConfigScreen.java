@@ -20,7 +20,9 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         GridWidget.Adder adder = gridWidget.createAdder(2);
 
         List<Text> chainModeText = new ArrayList<>();
-        adder.add(createIntegerButton("", () -> pendingConfig.chainMode, value -> pendingConfig.chainMode = value, chainModeText), 1);
+        chainModeText.add(Text.translatable("config.hoshikima.chain.mine.mode.one"));
+        chainModeText.add(Text.translatable("config.hoshikima.chain.mine.mode.two"));
+        adder.add(createIntegerButton("config.hoshikima.chain.mine.chain.mode", () -> pendingConfig.chainMode, value -> pendingConfig.chainMode = value, chainModeText), 1);
 
         gridWidget.refreshPositions();
         SimplePositioningWidget.setPos(gridWidget, 0, 32, this.width, this.height, 0.5f, 0.0f);                                                     gridWidget.forEachChild(this::addDrawableChild);
