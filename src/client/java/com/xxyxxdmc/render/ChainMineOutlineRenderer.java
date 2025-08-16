@@ -2,12 +2,25 @@ package com.xxyxxdmc.render;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Overlay;
 import net.minecraft.client.render.*;
+import net.minecraft.client.render.RenderPhase.Layering;
+import net.minecraft.client.render.RenderPhase.Lightmap;
+import net.minecraft.client.render.RenderPhase.LineWidth;
+import net.minecraft.client.render.RenderPhase.Target;
+import net.minecraft.client.render.RenderPhase.TextureBase;
+import net.minecraft.client.render.RenderPhase.Texturing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderPipeline.Snippet;
+import com.mojang.blaze3d.platform.DepthTestFunction;
+import com.xxyxxdmc.config.HoshikimaConfig;
+
+import net.minecraft.util.Identifier;
 import java.util.*;
 
 public class ChainMineOutlineRenderer {
@@ -18,6 +31,7 @@ public class ChainMineOutlineRenderer {
     private static final float R = 1.0f, G = 0.8f, B = 0.0f, A = 1.0f;
 
     public static void init() {
+        HoshikimaConfig config = HoshikimaConfig.get();
         WorldRenderEvents.LAST.register(context -> {
             if (blocksToRender.isEmpty()) return;
 
@@ -27,7 +41,7 @@ public class ChainMineOutlineRenderer {
             Camera camera = context.camera();
             Vec3d cameraPos = camera.getPos();
             Matrix4f matrix = context.matrixStack().peek().getPositionMatrix();
-            VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(RenderLayer.LINES);
+            VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(getRenderLayer(config.disableLineDeepTest));
 
             for (Edge edge : collectExposedEdges(blocksToRender)) {
                 Vec3d from = edge.p1.subtract(cameraPos);
@@ -43,6 +57,26 @@ public class ChainMineOutlineRenderer {
           .color(R, G, B, A).normal(0f, 1f, 0f);
         vc.vertex(matrix, (float) to.x, (float) to.y, (float) to.z)
           .color(R, G, B, A).normal(0f, 1f, 0f);
+    }
+
+    private static RenderLayer getRenderLayer(boolean enableDeethTest) {
+        RenderLayer noDeepTestLayer = RenderLayer.of("hoshikima_no_deep_test_line",
+        256,
+        RenderPipeline.builder()
+            .withVertexShader(Identifier.of("minecraft", "rendertype_lines.vsh"))
+            .withFragmentShader(Identifier.of("minecraft", "rendertype_lines.fsh"))
+            .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+            .build(),
+            RenderLayer.MultiPhaseParameters.builder()
+            .layering(Layering.NO_LAYERING)
+            .lightmap(Lightmap.DISABLE_LIGHTMAP)
+            .lineWidth(LineWidth.FULL_LINE_WIDTH)
+            .target(Target.OUTLINE_TARGET)
+            .texture(TextureBase.NO_TEXTURE)
+            .texturing(Texturing.DEFAULT_TEXTURING)
+            .build(false)
+        );
+        return disableDepthTest ? noDeepTestLayer : RenderLayer.LINES;
     }
 
     private static Vec3d[] adjustLineEndpoints(Vec3d from, Vec3d to) {

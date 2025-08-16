@@ -6,6 +6,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -80,6 +81,15 @@ public abstract class AbstractConfigScreen extends Screen {
                 messageSupplier.get(),
                 button -> {
                     boolean newValue = !getter.get();
+                    setter.accept(newValue);
+                    button.setMessage(messageSupplier.get());
+                }
+        ).width(150).build();
+    }
+    protected ButtonWidget createIntegerButton(String translationKey, Supplier<Integer> getter, Consumer<Integer> setter, List<Text> options) {
+        Text optionText = Text.translatable(translationKey);                                        Supplier<Text> messageSupplier = () -> optionText.copy().append(options.get(getter.get()));                                 return ButtonWidget.builder(                        messageSupplier.get(),
+                button -> {
+                    int newValue = (getter.get() + 1 >= options.size()) ? 0 : getter.get() + 1;
                     setter.accept(newValue);
                     button.setMessage(messageSupplier.get());
                 }

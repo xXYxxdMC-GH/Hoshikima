@@ -19,7 +19,7 @@ import java.net.URISyntaxException;
 public class HoshikimaConfigScreen extends AbstractConfigScreen {
 
     private static final String HOSHIKIMA_PART_STR = "Hoshikima";
-    private static final String CONFIGURATION_PART_STR = " Configuration";
+    private static final String CONFIGURATION_PART_STR = Text.of(" ").copy().append(Text.translatable("config.hoshikima.title")).getString();
     private static final Text JAPANESE_TITLE = Text.of("ホシキマ");
     private static final Text HOSHIKIMA_TEXT = Text.of(HOSHIKIMA_PART_STR);
 

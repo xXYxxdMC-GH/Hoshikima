@@ -1,10 +1,12 @@
 package com.xxyxxdmc.mixin;
 
+import com.xxyxxdmc.config.HoshikimaConfig;
 import com.xxyxxdmc.function.ChainMineState;
 import com.xxyxxdmc.init.callback.IChainMineState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -12,7 +14,10 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,7 +32,9 @@ public abstract class ServerPlayerInteractionManagerMixin {
     @Shadow private ServerPlayerEntity player;
     @Shadow private ServerWorld world;
 
-    private static final int MAX_BLOCKS_TO_BREAK = 128;
+    private static final HoshikimaConfig config = HoshikimaConfig.get();
+
+    private static final int MAX_BLOCKS_TO_BREAK = config.blockChainLimit;
 
     @Redirect(
             method = "tryBreakBlock",
@@ -40,19 +47,27 @@ public abstract class ServerPlayerInteractionManagerMixin {
         IChainMineState playerState = (IChainMineState) this.player;
         if (!playerState.isChainMiningActive()) {
             instance.afterBreak(world, player, pos, state, blockEntity, tool);
-            System.out.println("Action has been blocked by Chain not active.");
+            // System.out.println("Action has been blocked by Chain not active.");
             return;
         }
 
         Block originalBlock = state.getBlock();
 
-        System.out.println(originalBlock.toString());
+        // System.out.println(originalBlock.toString());
 
         ChainMineState.setChainMining(true);
         ChainMineState.clearCapturedDrops();
         ChainMineState.clearCapturedXp();
         try {
-            findAndBreakConnectedBlocks(pos, originalBlock);
+            switch (config.chainMode) {
+                case 0 :
+                    findAndBreakConnectedBlocks(pos, originalBlock);
+                    break;
+                case 1 :
+                    break;
+                default :
+                    break;
+            }
         } finally {
             ChainMineState.setChainMining(false);
             for (ItemStack drop : ChainMineState.getCapturedDrops()) {
@@ -64,6 +79,15 @@ public abstract class ServerPlayerInteractionManagerMixin {
             }
             ChainMineState.clearCapturedDrops();
             ChainMineState.clearCapturedXp();
+        }
+    }
+
+    private void locateAndBreakStringBlocks(BlockPos startPos, Block originalBlock) {
+        HitResult hit = MinecraftClient.getInstance().crosshairTarget;
+
+        if (hit instanceof BlockHitResult blockHit) {
+            Direction face = blockHit.getSide();
+            
         }
     }
 

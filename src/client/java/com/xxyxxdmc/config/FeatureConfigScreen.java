@@ -19,7 +19,8 @@ public class FeatureConfigScreen extends AbstractConfigScreen {
         gridWidget.getMainPositioner().margin(4, 4, 4, 0);
         GridWidget.Adder adder = gridWidget.createAdder(2);
 
-        adder.add(new TextWidget(Text.translatable("config.hoshikima.category.features.empty").formatted(Formatting.GRAY), this.textRenderer), 2);
+        // adder.add(new TextWidget(Text.translatable("config.hoshikima.category.features.empty").formatted(Formatting.GRAY), this.textRenderer), 2);
+        
 
         gridWidget.refreshPositions();
         SimplePositioningWidget.setPos(gridWidget, 0, 32, this.width, this.height, 0.5f, 0.0f);
