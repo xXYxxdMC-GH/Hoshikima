@@ -41,8 +41,7 @@ public class ChainMineOutlineRenderer {
             Camera camera = context.camera();
             Vec3d cameraPos = camera.getPos();
             Matrix4f matrix = context.matrixStack().peek().getPositionMatrix();
-            VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(getRenderLayer(config.disableLineDeepTest));
-
+            VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(config.disableLineDeepTest ?  getRenderLayer() : RenderLayer.LINES);
             for (Edge edge : collectExposedEdges(blocksToRender)) {
                 Vec3d from = edge.p1.subtract(cameraPos);
                 Vec3d to = edge.p2.subtract(cameraPos);
@@ -59,7 +58,7 @@ public class ChainMineOutlineRenderer {
           .color(R, G, B, A).normal(0f, 1f, 0f);
     }
 
-    private static RenderLayer getRenderLayer(boolean enableDeethTest) {
+    private static RenderLayer getRenderLayer() {
         RenderLayer noDeepTestLayer = RenderLayer.of("hoshikima_no_deep_test_line",
         256,
         RenderPipeline.builder()
@@ -76,7 +75,7 @@ public class ChainMineOutlineRenderer {
             .texturing(Texturing.DEFAULT_TEXTURING)
             .build(false)
         );
-        return disableDepthTest ? noDeepTestLayer : RenderLayer.LINES;
+        return noDeepTestLayer;
     }
 
     private static Vec3d[] adjustLineEndpoints(Vec3d from, Vec3d to) {
