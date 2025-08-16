@@ -6,10 +6,12 @@ import com.xxyxxdmc.init.callback.IChainMineState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.ExperienceOrbEntity;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
@@ -18,6 +20,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -47,13 +51,10 @@ public abstract class ServerPlayerInteractionManagerMixin {
         IChainMineState playerState = (IChainMineState) this.player;
         if (!playerState.isChainMiningActive()) {
             instance.afterBreak(world, player, pos, state, blockEntity, tool);
-            // System.out.println("Action has been blocked by Chain not active.");
             return;
         }
 
         Block originalBlock = state.getBlock();
-
-        // System.out.println(originalBlock.toString());
 
         ChainMineState.setChainMining(true);
         ChainMineState.clearCapturedDrops();
@@ -64,6 +65,7 @@ public abstract class ServerPlayerInteractionManagerMixin {
                     findAndBreakConnectedBlocks(pos, originalBlock);
                     break;
                 case 1 :
+                    locateAndBreakStringBlocks(pos);
                     break;
                 default :
                     break;
@@ -82,13 +84,25 @@ public abstract class ServerPlayerInteractionManagerMixin {
         }
     }
 
-    private void locateAndBreakStringBlocks(BlockPos startPos, Block originalBlock) {
-        HitResult hit = MinecraftClient.getInstance().crosshairTarget;
-
-        if (hit instanceof BlockHitResult blockHit) {
-            Direction face = blockHit.getSide();
-            
-        }
+    private void locateAndBreakStringBlocks(BlockPos pos) {
+        Direction oppDirection = getTargetedFace(this.world, this.player).getOpposite();
+        int breakedBlock = 0;
+        ItemStack mainHandStack = this.player.  getMainHandStack();
+        int dx = oppDirection.getOffsetX();
+        int dy = oppDirection.getOffsetY();
+        int dz = oppDirection.getOffsetZ();
+        for (int i = 0;breakedBlock < MAX_BLOCKS_TO_BREAK;i++,breakedBlock++){
+            BlockState block = this.world.getBlockState(pos.add(dx * i, dy * i, dz * i));
+            if (block.isAir()) {
+                breakedBlock--;
+                continue;
+            }
+            if (block.getHardness(world, pos) < 0) return;
+            if (mainHandStack.isDamageable() && mainHandStack.getDamage() >= mainHandStack.getMaxDamage() - 1) break;
+            this.world.breakBlock(pos, true, this.player);
+            if (!this.player.isCreative()) {                    mainHandStack.postMine(this.world, this.world.getBlockState(pos), pos, this.player);                                  
+            }
+        } 
     }
 
     private void findAndBreakConnectedBlocks(BlockPos startPos, Block originalBlock) {
@@ -144,5 +158,27 @@ public abstract class ServerPlayerInteractionManagerMixin {
                 }
             }
         }
+    }
+
+    public static Direction getTargetedFace(World world, PlayerEntity player) {
+        Vec3d eyePos = player.getEyePos();
+        Vec3d lookVec = player.getRotationVec(1.0F);
+        Vec3d reachEnd = eyePos.add(lookVec.multiply(player.getAttributes().getValue(EntityAttributes.BLOCK_INTERACTION_RANGE)));
+
+        RaycastContext context = new RaycastContext(
+            eyePos,
+            reachEnd,
+            RaycastContext.ShapeType.OUTLINE,
+            RaycastContext.FluidHandling.NONE,
+            player
+        );
+
+        HitResult result = world.raycast(context);
+
+        if (result instanceof BlockHitResult blockHit) {
+            return blockHit.getSide();
+        }
+
+        return null;
     }
 }
