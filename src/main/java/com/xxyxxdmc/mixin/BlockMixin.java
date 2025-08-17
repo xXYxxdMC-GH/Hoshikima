@@ -1,5 +1,6 @@
 package com.xxyxxdmc.mixin;
 
+import com.xxyxxdmc.config.HoshikimaConfig;
 import com.xxyxxdmc.function.ChainMineState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -17,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(Block.class)
 public class BlockMixin {
+    private static final HoshikimaConfig config = HoshikimaConfig.get();
     @Inject(method = "dropStack(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/item/ItemStack;)V", at = @At("HEAD"), cancellable = true)
     private static void onDropStack(World world, BlockPos pos, ItemStack stack, CallbackInfo ci) {
         if (ChainMineState.isChainMining()) {
@@ -30,7 +32,7 @@ public class BlockMixin {
         cancellable = true
     )
     private static void onDropExperience(ServerWorld world, BlockPos pos, ItemStack stack, IntProvider intProvider, CallbackInfo ci) {
-        if (ChainMineState.isChainMining()) {
+        if (ChainMineState.isChainMining() && config.enableExpGather) {
             int experienceAmount = intProvider.get(world.getRandom());
     experienceAmount = EnchantmentHelper.getBlockExperience(world, stack, experienceAmount);
             ChainMineState.addCapturedXp(experienceAmount);

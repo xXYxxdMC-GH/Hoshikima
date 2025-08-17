@@ -2,14 +2,25 @@ package com.xxyxxdmc.mixin;
 
 import com.xxyxxdmc.init.callback.IChainMineState;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+
+import static com.xxyxxdmc.init.ModDataComponents.register;
+
+import java.util.List;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin implements IChainMineState {
 
     @Unique
     private boolean chainMineActive = false;
+    @Unique
+    private List<BlockPos> pendingBreakList = null;
+    @Unique
+    private Direction direction = null;
 
     @Override
     public boolean isChainMiningActive() {
@@ -19,5 +30,30 @@ public abstract class ServerPlayerEntityMixin implements IChainMineState {
     @Override
     public void setChainMiningActive(boolean active) {
         this.chainMineActive = active;
+    }
+
+    @Override
+    public void setPendingBreakList(List<BlockPos> blocks) {
+        this.pendingBreakList = blocks;
+    }
+
+    @Override
+    public List<BlockPos> getPendingBreakList() {
+        return this.pendingBreakList;
+    }
+
+    @Override
+    public void clearPendingBreakList() {
+        this.pendingBreakList = null;
+    }
+
+    @Override
+    public Direction getDirection() {
+        return this.direction;
+    }
+
+    @Override
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 }

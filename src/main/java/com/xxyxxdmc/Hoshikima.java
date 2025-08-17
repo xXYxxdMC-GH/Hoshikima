@@ -32,6 +32,7 @@ import static com.xxyxxdmc.init.ModDataComponents.COUNT;
 public class Hoshikima implements ModInitializer {
 	public static final String MOD_ID = "hoshikima";
 	public static final Identifier CHAIN_MINE_PACKET_ID = Identifier.of(MOD_ID, "chain_mine_key_state");
+	public static final Identifier DIRECTION_PACKET_ID = Identifier.of(MOD_ID, "direction_packet");
 	public static final Logger LOGGER = Logger.getLogger("Hoshikima");
 
 	@Override

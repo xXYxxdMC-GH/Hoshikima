@@ -2,7 +2,6 @@ package com.xxyxxdmc.render;
 
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Overlay;
 import net.minecraft.client.render.*;
 import net.minecraft.client.render.RenderPhase.Layering;
 import net.minecraft.client.render.RenderPhase.Lightmap;
@@ -16,9 +15,9 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.pipeline.RenderPipeline.Snippet;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.xxyxxdmc.config.HoshikimaConfig;
+import com.xxyxxdmc.config.CommonValue;
 
 import net.minecraft.util.Identifier;
 import java.util.*;
@@ -28,10 +27,9 @@ public class ChainMineOutlineRenderer {
     private static Set<BlockPos> blocksToRender = Collections.emptySet();
     public static boolean disableDepthTest = true;
 
-    private static final float R = 1.0f, G = 0.8f, B = 0.0f, A = 1.0f;
+    private static final HoshikimaConfig config = HoshikimaConfig.get();
 
     public static void init() {
-        HoshikimaConfig config = HoshikimaConfig.get();
         WorldRenderEvents.LAST.register(context -> {
             if (blocksToRender.isEmpty()) return;
 
@@ -41,7 +39,7 @@ public class ChainMineOutlineRenderer {
             Camera camera = context.camera();
             Vec3d cameraPos = camera.getPos();
             Matrix4f matrix = context.matrixStack().peek().getPositionMatrix();
-            VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(config.disableLineDeepTest ?  getRenderLayer() : RenderLayer.LINES);
+            VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(config.disableLineDeepTest ? getRenderLayer() : RenderLayer.LINES);
             for (Edge edge : collectExposedEdges(blocksToRender)) {
                 Vec3d from = edge.p1.subtract(cameraPos);
                 Vec3d to = edge.p2.subtract(cameraPos);
@@ -53,9 +51,9 @@ public class ChainMineOutlineRenderer {
 
     private static void drawEdge(VertexConsumer vc, Matrix4f matrix, Vec3d from, Vec3d to) {
         vc.vertex(matrix, (float) from.x, (float) from.y, (float) from.z)
-          .color(R, G, B, A).normal(0f, 1f, 0f);
+          .color(CommonValue.colors.get(config.lineColor)).normal(0f, 1f, 0f);
         vc.vertex(matrix, (float) to.x, (float) to.y, (float) to.z)
-          .color(R, G, B, A).normal(0f, 1f, 0f);
+          .color(CommonValue.colors.get(config.lineColor)).normal(0f, 1f, 0f);
     }
 
     private static RenderLayer getRenderLayer() {

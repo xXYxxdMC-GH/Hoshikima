@@ -14,7 +14,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.Color;
 
 public class HoshikimaConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger("HoshikimaConfig");
@@ -33,10 +32,11 @@ public class HoshikimaConfig {
     public int textTooltipDetailLevel = 1;
     public boolean enableChainMine = true;
     public int chainMode = 0;
-    public boolean disableLineDeepTest = true;
-    public int lineColor = Color.WHITE.getRGB();
+    public boolean disableLineDeepTest = false;
+    public int lineColor = 6;
     public int blockChainLimit = 64;
     public int antiToolBreakValue = 0;
+    public boolean enableExpGather = true;
 
     public HoshikimaConfig() {}
 
@@ -54,6 +54,7 @@ public class HoshikimaConfig {
         this.lineColor = other.lineColor;
         this.blockChainLimit = other.blockChainLimit;
         this.antiToolBreakValue = other.antiToolBreakValue;
+        this.enableExpGather = other.enableExpGather;
     }
 
     public void apply(HoshikimaConfig other) {
@@ -70,6 +71,7 @@ public class HoshikimaConfig {
         this.lineColor = other.lineColor; 
         this.blockChainLimit = other.blockChainLimit;
         this.antiToolBreakValue = other.antiToolBreakValue;
+        this.enableExpGather = other.enableExpGather;
     }
 
     public static synchronized HoshikimaConfig get() {

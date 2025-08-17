@@ -12,10 +12,13 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 
 @SuppressWarnings("unused")
 public class HoshikimaClient implements ClientModInitializer {
 	private boolean wasChainMineKeyPressed = false;
+	private int direction = 0;
+	private boolean directionChanged = false;
 	private BlockPos lastQueriedPos = null;
 
 	@Override
@@ -36,12 +39,17 @@ public class HoshikimaClient implements ClientModInitializer {
 			return;
 		}
 		boolean isChainKeyDown = HoshikimaKeyBind.CHAIN_MINE_KEY.isPressed();
-		if (isChainKeyDown != wasChainMineKeyPressed) {
-			ClientPlayNetworking.send(new ChainMineKeyPressPayload(isChainKeyDown));
+		HitResult hitResult = client.crosshairTarget;  
+		int newDirection = 0;
+		if (hitResult instanceof BlockHitResult blockHitResult) newDirection = blockHitResult.getSide().getIndex();
+		if (isChainKeyDown != wasChainMineKeyPressed || direction != newDirection) {
+			ClientPlayNetworking.send(new ChainMineKeyPressPayload(isChainKeyDown, newDirection));
 			wasChainMineKeyPressed = isChainKeyDown;
+			direction = newDirection;
+			directionChanged = true;
 		}
 		BlockPos targetPos = null;
-		if (isChainKeyDown && client.crosshairTarget != null && client.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+		if (isChainKeyDown && hitResult != null && hitResult.getType() == HitResult.Type.BLOCK) {
 			targetPos = ((BlockHitResult) client.crosshairTarget).getBlockPos();
 		}
 		if (targetPos == null) {
@@ -52,7 +60,7 @@ public class HoshikimaClient implements ClientModInitializer {
 			return;
 		}
 
-		if (!targetPos.equals(lastQueriedPos)) {
+		if (directionChanged || targetPos.equals(lastQueriedPos)){
 			lastQueriedPos = targetPos;
 			ClientPlayNetworking.send(new QueryChainMineBlocksPacket(targetPos));
 		}

@@ -60,16 +60,7 @@ public abstract class ServerPlayerInteractionManagerMixin {
         ChainMineState.clearCapturedDrops();
         ChainMineState.clearCapturedXp();
         try {
-            switch (config.chainMode) {
-                case 0 :
-                    findAndBreakConnectedBlocks(pos, originalBlock);
-                    break;
-                case 1 :
-                    locateAndBreakStringBlocks(pos);
-                    break;
-                default :
-                    break;
-            }
+            breakPendingBlocks();
         } finally {
             ChainMineState.setChainMining(false);
             for (ItemStack drop : ChainMineState.getCapturedDrops()) {
@@ -83,102 +74,29 @@ public abstract class ServerPlayerInteractionManagerMixin {
             ChainMineState.clearCapturedXp();
         }
     }
+    
+    private void breakPendingBlocks() {
+    IChainMineState state = (IChainMineState) this.player;
+    List<BlockPos> blocksToBreak = state.getPendingBreakList();
 
-    private void locateAndBreakStringBlocks(BlockPos pos) {
-        Direction oppDirection = getTargetedFace(this.world, this.player).getOpposite();
-        int breakedBlock = 0;
-        ItemStack mainHandStack = this.player.  getMainHandStack();
-        int dx = oppDirection.getOffsetX();
-        int dy = oppDirection.getOffsetY();
-        int dz = oppDirection.getOffsetZ();
-        for (int i = 0;breakedBlock < MAX_BLOCKS_TO_BREAK;i++,breakedBlock++){
-            BlockState block = this.world.getBlockState(pos.add(dx * i, dy * i, dz * i));
-            if (block.isAir()) {
-                breakedBlock--;
-                continue;
-            }
-            if (block.getHardness(world, pos) < 0) return;
-            if (mainHandStack.isDamageable() && mainHandStack.getDamage() >= mainHandStack.getMaxDamage() - 1) break;
-            this.world.breakBlock(pos, true, this.player);
-            if (!this.player.isCreative()) {                    mainHandStack.postMine(this.world, this.world.getBlockState(pos), pos, this.player);                                  
-            }
-        } 
-    }
+    if (blocksToBreak == null || blocksToBreak.isEmpty()) return;
 
-    private void findAndBreakConnectedBlocks(BlockPos startPos, Block originalBlock) {
-        List<BlockPos> blocksToBreak = findConnectedBlocks(startPos, originalBlock);
+    int broken = 0;
+    ItemStack mainHandStack = this.player.getMainHandStack();
 
-        int blocksBroken = 0;
-        ItemStack mainHandStack = this.player.getMainHandStack();
+    for (BlockPos pos : blocksToBreak) {
+        if (broken >= MAX_BLOCKS_TO_BREAK) break;
+        if (mainHandStack.isDamageable() && mainHandStack.getDamage() >= mainHandStack.getMaxDamage() - 1) break;
 
-        for (BlockPos currentPos : blocksToBreak) {
-            if (blocksBroken >= MAX_BLOCKS_TO_BREAK) break;
+        this.world.breakBlock(pos, true, this.player);
 
-            if (mainHandStack.isDamageable() && mainHandStack.getDamage() >= mainHandStack.getMaxDamage() - 1) {
-                break;
-            }
-
-            this.world.breakBlock(currentPos, true, this.player);
-
-            if (!this.player.isCreative()) {
-                mainHandStack.postMine(this.world, this.world.getBlockState(currentPos), currentPos, this.player);
-            }
-            blocksBroken++;
-        }
-    }
-
-    private List<BlockPos> findConnectedBlocks(BlockPos startPos, Block originalBlock) {
-        List<BlockPos> foundBlocks = new ArrayList<>();
-        Queue<BlockPos> blocksToVisit = new LinkedList<>();
-        Set<BlockPos> visited = new HashSet<>();
-
-        addNeighborsToQueue(startPos, blocksToVisit, visited);
-
-        while (!blocksToVisit.isEmpty() && foundBlocks.size() < MAX_BLOCKS_TO_BREAK) {
-            BlockPos currentPos = blocksToVisit.poll();
-
-            if (this.world.getBlockState(currentPos).isOf(originalBlock)) {
-                foundBlocks.add(currentPos);
-                addNeighborsToQueue(currentPos, blocksToVisit, visited);
-            }
-        }
-        return foundBlocks;
-    }
-
-
-    private void addNeighborsToQueue(BlockPos pos, Queue<BlockPos> queue, Set<BlockPos> visited) {
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    if (x == 0 && y == 0 && z == 0) continue;
-                    BlockPos neighborPos = pos.add(x, y, z);
-                    if (visited.add(neighborPos)) {
-                        queue.add(neighborPos);
-                    }
-                }
-            }
-        }
-    }
-
-    private static Direction getTargetedFace(World world, PlayerEntity player) {
-        Vec3d eyePos = player.getEyePos();
-        Vec3d lookVec = player.getRotationVec(1.0F);
-        Vec3d reachEnd = eyePos.add(lookVec.multiply(player.getAttributes().getValue(EntityAttributes.BLOCK_INTERACTION_RANGE)));
-
-        RaycastContext context = new RaycastContext(
-            eyePos,
-            reachEnd,
-            RaycastContext.ShapeType.OUTLINE,
-            RaycastContext.FluidHandling.NONE,
-            player
-        );
-
-        HitResult result = world.raycast(context);
-
-        if (result instanceof BlockHitResult blockHit) {
-            return blockHit.getSide();
+        if (!this.player.isCreative()) {
+            mainHandStack.postMine(this.world, this.world.getBlockState(pos), pos, this.player);
         }
 
-        return null;
+        broken++;
     }
+
+    state.clearPendingBreakList();
+}
 }

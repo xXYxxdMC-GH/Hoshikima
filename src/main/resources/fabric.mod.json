@@ -27,6 +27,9 @@
 		],
 		"modmenu": [
 			"com.xxyxxdmc.config.ModMenuIntegration"
+		],
+		"jade": [
+			"com.xxyxxdmc.init.plugin.JadePlugin"
 		]
 	},
 	"mixins": [
