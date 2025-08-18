@@ -40,6 +40,7 @@
   "config.hoshikima.chain.mine.color.cyan": "Cyan",
   "config.hoshikima.chain.mine.color.white": "White",
   "config.hoshikima.chain.mine.color.black": "Black",
+  "config.hoshikima.chain.mine.disable.deep.test": "Always Show Line",
   "config.hoshikima.chain.mine.skip.blocks": "Air Skip Limit Once",
   "config.hoshikima.chain.mine.skip.blocks.total": "Total Skipped Air Blocks",
   "config.hoshikima.chain.mine.tool.save": "Durability Threshold",

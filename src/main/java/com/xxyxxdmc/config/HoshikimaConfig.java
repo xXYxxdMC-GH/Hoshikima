@@ -28,7 +28,7 @@ public class HoshikimaConfig {
     public boolean enableLargeBucket = true;
     public boolean enableMultiFluidBucket = true;
     public boolean enableRottenFleshCluster = false;
-    public List<Block> chainableBlocks = new ArrayList<>();
+    public List<String> chainableBlocks = new ArrayList<>();
     public int textTooltipDetailLevel = 1;
     public boolean enableChainMine = true;
     public int chainMode = 0;

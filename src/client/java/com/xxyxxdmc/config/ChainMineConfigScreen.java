@@ -38,7 +38,11 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         adder.add(createIntegerButton(
                 "config.hoshikima.chain.mine.color", 
                 () -> pendingConfig.lineColor , 
-                value -> pendingConfig.lineColor = value, colorTexts));  
+                value -> pendingConfig.lineColor = value, colorTexts));
+
+        adder.add(createBooleanButton("config.hoshikima.chain.mine.disable.deep.test",
+                () -> pendingConfig.disableLineDeepTest,
+                value -> pendingConfig.disableLineDeepTest = value),1);
 
         adder.add(createSliderWidget("config.hoshikima.chain.mine.skip.blocks", 8, 0, pendingConfig.skipAirBlocksInOnce, pendingConfig, 0), 1);
 
