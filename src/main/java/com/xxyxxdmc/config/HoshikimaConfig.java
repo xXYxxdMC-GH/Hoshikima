@@ -37,6 +37,8 @@ public class HoshikimaConfig {
     public int blockChainLimit = 64;
     public int antiToolBreakValue = 0;
     public boolean enableExpGather = true;
+    public int skipAirBlocksInOnce = 1;
+    public int skipAirBlocksInTotal = 16;
 
     public HoshikimaConfig() {}
 
@@ -55,6 +57,8 @@ public class HoshikimaConfig {
         this.blockChainLimit = other.blockChainLimit;
         this.antiToolBreakValue = other.antiToolBreakValue;
         this.enableExpGather = other.enableExpGather;
+        this.skipAirBlocksInOnce = other.skipAirBlocksInOnce;
+        this.skipAirBlocksInTotal = other.skipAirBlocksInTotal;
     }
 
     public void apply(HoshikimaConfig other) {
@@ -72,6 +76,8 @@ public class HoshikimaConfig {
         this.blockChainLimit = other.blockChainLimit;
         this.antiToolBreakValue = other.antiToolBreakValue;
         this.enableExpGather = other.enableExpGather;
+        this.skipAirBlocksInOnce = other.skipAirBlocksInOnce;
+        this.skipAirBlocksInTotal = other.skipAirBlocksInTotal;
     }
 
     public static synchronized HoshikimaConfig get() {

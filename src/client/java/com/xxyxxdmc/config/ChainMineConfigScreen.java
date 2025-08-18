@@ -1,17 +1,15 @@
 package com.xxyxxdmc.config;
 
-import java.awt.Color;
 import java.util.ArrayList;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.gui.widget.SimplePositioningWidget;
-import net.minecraft.text.Text; 
+import net.minecraft.client.gui.widget.TextWidget;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 public class ChainMineConfigScreen extends AbstractConfigScreen {
     protected ChainMineConfigScreen(Screen parent, HoshikimaConfig pendingConfig) {
@@ -23,6 +21,7 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         gridWidget.getMainPositioner().margin(4, 4, 4, 0);
         GridWidget.Adder adder = gridWidget.createAdder(2);
 
+        adder.add(createBooleanButton("config.hoshikima.category.chain.mine", () -> pendingConfig.enableChainMine, value -> pendingConfig.enableChainMine = value));
         List<Text> chainModeText = new ArrayList<>();
         chainModeText.add(Text.translatable("config.hoshikima.chain.mine.mode.one"));
         chainModeText.add(Text.translatable("config.hoshikima.chain.mine.mode.two"));
@@ -39,7 +38,13 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         adder.add(createIntegerButton(
                 "config.hoshikima.chain.mine.color", 
                 () -> pendingConfig.lineColor , 
-                value -> pendingConfig.lineColor = value, colorTexts));    
+                value -> pendingConfig.lineColor = value, colorTexts));  
+
+        adder.add(createSliderWidget("config.hoshikima.chain.mine.skip.blocks", 8, 0, pendingConfig.skipAirBlocksInOnce, pendingConfig, 0), 1);
+
+        adder.add(createSliderWidget("config.hoshikima.chain.mine.skip.blocks.total", 64, 8, pendingConfig.skipAirBlocksInTotal, pendingConfig, 1), 1);
+
+        adder.add(createSliderWidget("config.hoshikima.chain.mine.tool.save", 512, 0, pendingConfig.antiToolBreakValue, pendingConfig, 2), 1);
 
         gridWidget.refreshPositions();
         SimplePositioningWidget.setPos(gridWidget, 0, 32, this.width, this.height, 0.5f, 0.0f); 

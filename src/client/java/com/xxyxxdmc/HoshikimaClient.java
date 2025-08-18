@@ -3,6 +3,8 @@ package com.xxyxxdmc;
 import com.xxyxxdmc.networking.payload.ChainMineKeyPressPayload;
 import com.xxyxxdmc.networking.payload.UpdateChainMineOutlinePacket;
 import net.minecraft.client.MinecraftClient;
+
+import com.xxyxxdmc.config.HoshikimaConfig;
 import com.xxyxxdmc.key.HoshikimaKeyBind;
 import com.xxyxxdmc.networking.payload.QueryChainMineBlocksPacket;
 import com.xxyxxdmc.render.ChainMineOutlineRenderer;
@@ -12,7 +14,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 
 @SuppressWarnings("unused")
 public class HoshikimaClient implements ClientModInitializer {
@@ -20,9 +21,11 @@ public class HoshikimaClient implements ClientModInitializer {
 	private int direction = 0;
 	private boolean directionChanged = false;
 	private BlockPos lastQueriedPos = null;
+	private static final HoshikimaConfig config = HoshikimaConfig.get();
 
 	@Override
 	public void onInitializeClient() {
+		if (!config.enableChainMine) return;
 		HoshikimaKeyBind.register();
 		ChainMineOutlineRenderer.init();
 		ClientPlayNetworking.registerGlobalReceiver(UpdateChainMineOutlinePacket.ID, (payload, context) -> {

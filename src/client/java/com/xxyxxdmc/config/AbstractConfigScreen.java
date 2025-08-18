@@ -3,8 +3,10 @@ package com.xxyxxdmc.config;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.screen.ScreenTexts;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -95,5 +97,42 @@ public abstract class AbstractConfigScreen extends Screen {
                     button.setMessage(messageSupplier.get());
                 }
         ).width(150).build();
+    }
+    protected IntegerSliderWidget createSliderWidget(String translationKey, double max, double min, double value, HoshikimaConfig config, int mode) {
+        return new IntegerSliderWidget(Text.translatable(translationKey), value, max, min, config, mode);
+    }
+}
+class IntegerSliderWidget extends SliderWidget{
+    private double max;
+    private double min;
+    private HoshikimaConfig config;
+    private int mode;
+    private Text text;
+    public IntegerSliderWidget(Text text, double value, double max, double min, HoshikimaConfig config, int mode) {
+        super(0, 0, 150, 20, text, (double) (value - min) / (max - min));
+        this.max = max;
+        this.min = min;
+        this.config = config;
+        this.mode = mode;
+        this.text = text;
+        this.updateMessage();
+    }
+    @Override
+    protected void updateMessage() {
+        this.setMessage(text.copy().append(": ").append(String.valueOf(this.getIntegerValue())));
+    }
+
+    @Override
+    protected void applyValue() {
+        switch (mode) {
+            case 0 -> this.config.skipAirBlocksInOnce = this.getIntegerValue();
+            case 1 -> this.config.skipAirBlocksInTotal = this.getIntegerValue();
+            case 2 -> this.config.antiToolBreakValue = this.getIntegerValue();
+            default -> {}
+        }
+    }
+
+    public int getIntegerValue() {
+        return (int) MathHelper.lerp(this.value, min, max);
     }
 }
