@@ -2,16 +2,20 @@ package com.xxyxxdmc.config;
 
 import java.util.ArrayList;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.gui.widget.SimplePositioningWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.List;
 
 public class ChainMineConfigScreen extends AbstractConfigScreen {
+    private PrecisionSliderWidget slider;
     protected ChainMineConfigScreen(Screen parent, HoshikimaConfig pendingConfig) {
         super(parent, Text.translatable("config.hoshikima.category.chain.mine"), HoshikimaConfig.get(), pendingConfig);
     }
@@ -49,6 +53,41 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         adder.add(createSliderWidget("config.hoshikima.chain.mine.skip.blocks.total", 64, 8, pendingConfig.skipAirBlocksInTotal, pendingConfig, 1), 1);
 
         adder.add(createSliderWidget("config.hoshikima.chain.mine.tool.save", 512, 0, pendingConfig.antiToolBreakValue, pendingConfig, 2), 1);
+
+        adder.add(new IntegerSliderWidget(Text.translatable("config.hoshikima.chain.mine.limit"), pendingConfig.blockChainLimit, 2048, 1, pendingConfig, 3) {
+            @Override
+            public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+                if (this.isHovered()) {
+                    double step;
+                    if (Screen.hasControlDown() && Screen.hasShiftDown()) {
+                        step = 100.0;
+                    } else if (Screen.hasControlDown()) {
+                        step = 50.0;
+                    } else if (Screen.hasShiftDown()) {
+                        step = 10.0;
+                    } else {
+                        step = 1.0;
+                    }
+
+                    double deltaValue = (verticalAmount * step) / (2048 - 1);
+                    this.value += deltaValue;
+
+                    this.value = MathHelper.clamp(this.value, 0.0, 1.0);
+
+                    this.updateMessage();
+                    this.applyValue();
+
+                    return true;
+                }
+                return false;
+            }
+            @Override
+            protected void updateMessage() {
+                if (this.value == 1.0) this.setMessage(Text.translatable("config.hoshikima.chain.mine.limit.max"));
+                else if (this.value == 0.0) this.setMessage(Text.translatable("config.hoshikima.chain.mine.limit.min"));
+                else this.setMessage(Text.translatable("config.hoshikima.chain.mine.limit").copy().append(": ").append(String.valueOf(this.getIntegerValue())));
+            }
+        }, 1);
 
         gridWidget.refreshPositions();
         SimplePositioningWidget.setPos(gridWidget, 0, 32, this.width, this.height, 0.5f, 0.0f); 

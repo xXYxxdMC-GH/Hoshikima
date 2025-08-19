@@ -88,9 +88,11 @@ public abstract class AbstractConfigScreen extends Screen {
                 }
         ).width(150).build();
     }
+
     protected ButtonWidget createIntegerButton(String translationKey, Supplier<Integer> getter, Consumer<Integer> setter, List<Text> options) {
-        Text optionText = Text.translatable(translationKey);                                        Supplier<Text> messageSupplier = () -> optionText.copy().append(": ").append(options.get(getter.get()));                                 
-        return ButtonWidget.builder(                        messageSupplier.get(),
+        Text optionText = Text.translatable(translationKey);
+        Supplier<Text> messageSupplier = () -> optionText.copy().append(": ").append(options.get(getter.get()));
+        return ButtonWidget.builder(messageSupplier.get(),
                 button -> {
                     int newValue = (getter.get() + 1 >= options.size()) ? 0 : getter.get() + 1;
                     setter.accept(newValue);
@@ -98,18 +100,18 @@ public abstract class AbstractConfigScreen extends Screen {
                 }
         ).width(150).build();
     }
-    protected IntegerSliderWidget createSliderWidget(String translationKey, double max, double min, double value, HoshikimaConfig config, int mode) {
+    IntegerSliderWidget createSliderWidget(String translationKey, double max, double min, double value, HoshikimaConfig config, int mode) {
         return new IntegerSliderWidget(Text.translatable(translationKey), value, max, min, config, mode);
     }
 }
-class IntegerSliderWidget extends SliderWidget{
+class IntegerSliderWidget extends SliderWidget {
     private double max;
     private double min;
     private HoshikimaConfig config;
     private int mode;
     private Text text;
     public IntegerSliderWidget(Text text, double value, double max, double min, HoshikimaConfig config, int mode) {
-        super(0, 0, 150, 20, text, (double) (value - min) / (max - min));
+        super(0, 0, 150, 20, text, (value - min) / (max - min));
         this.max = max;
         this.min = min;
         this.config = config;
@@ -128,6 +130,7 @@ class IntegerSliderWidget extends SliderWidget{
             case 0 -> this.config.skipAirBlocksInOnce = this.getIntegerValue();
             case 1 -> this.config.skipAirBlocksInTotal = this.getIntegerValue();
             case 2 -> this.config.antiToolBreakValue = this.getIntegerValue();
+            case 3 -> this.config.blockChainLimit = this.getIntegerValue();
             default -> {}
         }
     }

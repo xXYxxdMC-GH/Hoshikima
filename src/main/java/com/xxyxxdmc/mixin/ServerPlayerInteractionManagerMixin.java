@@ -6,6 +6,8 @@ import com.xxyxxdmc.init.callback.IChainMineState;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ToolComponent;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -41,8 +43,6 @@ public abstract class ServerPlayerInteractionManagerMixin {
     @Shadow @Final private ServerWorld world;
 
     private static final HoshikimaConfig config = HoshikimaConfig.get();
-
-    private static final int MAX_BLOCKS_TO_BREAK = config.blockChainLimit;
 
     @Inject(
             method = "tryBreakBlock",
@@ -89,14 +89,15 @@ public abstract class ServerPlayerInteractionManagerMixin {
         ItemStack mainHandStack = this.player.getMainHandStack();
 
         for (BlockPos pos : blocksToBreak) {
-            if (broken >= MAX_BLOCKS_TO_BREAK) break;
+            if (broken > config.blockChainLimit) break;
             if (mainHandStack.isDamageable() && mainHandStack.getDamage() + config.antiToolBreakValue >= mainHandStack.getMaxDamage() - 1) break;
-            if (this.world.getBlockState(pos).getHardness(world, pos) < 0 && !player.isCreative()) break;
+            BlockState blockState = this.world.getBlockState(pos);
+            if (blockState.getHardness(world, pos) < 0 && !player.isCreative()) break;
 
-            this.world.breakBlock(pos, (!this.player.isCreative() && this.player.canHarvest(this.world.getBlockState(pos))), this.player);
+            this.world.breakBlock(pos, (!this.player.isCreative() && this.player.canHarvest(blockState)), this.player);
 
             if (!player.isCreative()) {
-                mainHandStack.postMine(world, world.getBlockState(pos), pos, player);
+                mainHandStack.postMine(world, blockState, pos, player);
             }
 
             broken++;

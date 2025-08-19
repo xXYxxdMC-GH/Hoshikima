@@ -31,10 +31,10 @@ public class BlockMixin {
         at = @At(value = "HEAD"),
         cancellable = true
     )
-    private static void onDropExperience(ServerWorld world, BlockPos pos, ItemStack stack, IntProvider intProvider, CallbackInfo ci) {
+    private void onDropExperience(ServerWorld world, BlockPos pos, ItemStack tool, IntProvider experience, CallbackInfo ci) {
         if (ChainMineState.isChainMining() && config.enableExpGather) {
-            int experienceAmount = intProvider.get(world.getRandom());
-    experienceAmount = EnchantmentHelper.getBlockExperience(world, stack, experienceAmount);
+            int experienceAmount = experience.get(world.getRandom());
+            experienceAmount = EnchantmentHelper.getBlockExperience(world, tool, experienceAmount);
             ChainMineState.addCapturedXp(experienceAmount);
             ci.cancel();
         }

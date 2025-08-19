@@ -56,7 +56,6 @@ public class ModMessages {
             case 0 -> {
                 result = findConnectedBlocks(world, startPos, startState.getBlock());
                 result.addFirst(startPos);
-                break;
             }
             case 1 -> {
                 Direction face = playerState.getDirection();
@@ -81,11 +80,9 @@ public class ModMessages {
                     if (state.getHardness(world, target) < 0 && !player.isCreative()) break;
                     result.add(target);
                 }
-                break;
             }
             default -> {
                 result = Collections.emptyList();
-                break;
             }
         }
 
@@ -105,15 +102,17 @@ public class ModMessages {
         Queue<BlockPos> blocksToVisit = new LinkedList<>();
         Set<BlockPos> visited = new HashSet<>();
 
-        addNeighborsToQueue(startPos, blocksToVisit, visited);
+        blocksToVisit.add(startPos);
         visited.add(startPos);
 
         while (!blocksToVisit.isEmpty() && foundBlocks.size() < config.blockChainLimit) {
             BlockPos currentPos = blocksToVisit.poll();
 
             if (world.getBlockState(currentPos).isOf(originalBlock)) {
-                foundBlocks.add(currentPos);
-                addNeighborsToQueue(currentPos, blocksToVisit, visited);
+                if (foundBlocks.size() < config.blockChainLimit) {
+                    foundBlocks.add(currentPos);
+                    addNeighborsToQueue(currentPos, blocksToVisit, visited);
+                }
             }
         }
         return foundBlocks;
