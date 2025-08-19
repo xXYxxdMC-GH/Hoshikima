@@ -44,7 +44,7 @@ public class ModMessages {
         World world = player.getWorld();
         BlockState startState = world.getBlockState(startPos);
 
-        if (startState.isAir() || startState.getHardness(world, startPos) < 0) {
+        if (startState.isAir() || (startState.getHardness(world, startPos) < 0 && !player.isCreative())) {
             ServerPlayNetworking.send(player, new UpdateChainMineOutlinePacket(Collections.emptyList()));
             return;
         }
@@ -55,7 +55,7 @@ public class ModMessages {
         switch (config.chainMode) {
             case 0 -> {
                 result = findConnectedBlocks(world, startPos, startState.getBlock());
-                result.add(0, startPos);
+                result.addFirst(startPos);
                 break;
             }
             case 1 -> {
@@ -66,12 +66,19 @@ public class ModMessages {
                 int dx = direction.getOffsetX();
                 int dy = direction.getOffsetY();
                 int dz = direction.getOffsetZ();
-
+                int airs = 0;
+                int totalAirs = 0;
                 for (int i = 0; i < config.blockChainLimit; i++) {
                     BlockPos target = startPos.add(dx * i, dy * i, dz * i);
                     BlockState state = world.getBlockState(target);
-                    if (state.isAir()) continue;
-                    if (state.getHardness(world, target) < 0) break;
+                    if (state.isAir()) {
+                        if (airs < config.skipAirBlocksInOnce && totalAirs < config.skipAirBlocksInTotal) {
+                            airs++;
+                            totalAirs++;
+                            continue;
+                        } else break;
+                    } else airs = 0;
+                    if (state.getHardness(world, target) < 0 && !player.isCreative()) break;
                     result.add(target);
                 }
                 break;
@@ -124,27 +131,5 @@ public class ModMessages {
                 }
             }
         }
-    }
-
-    private static Direction getTargetedFace(World world, ServerPlayerEntity player) {
-        Vec3d eyePos = player.getEyePos();
-        Vec3d lookVec = player.getRotationVec(1.0F);
-        double reach = player.getAttributes().getValue(EntityAttributes.BLOCK_INTERACTION_RANGE);
-        Vec3d reachEnd = eyePos.add(lookVec.multiply(reach));
-
-        RaycastContext context = new RaycastContext(
-            eyePos,
-            reachEnd,
-            RaycastContext.ShapeType.OUTLINE,
-            RaycastContext.FluidHandling.NONE,
-            player
-        );
-
-        HitResult result = world.raycast(context);
-        if (result instanceof BlockHitResult blockHit) {
-            return blockHit.getSide();
-        }
-
-        return null;
     }
 }

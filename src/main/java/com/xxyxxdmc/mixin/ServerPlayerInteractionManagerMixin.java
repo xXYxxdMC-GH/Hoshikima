@@ -23,38 +23,40 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.*;
 
 @Mixin(ServerPlayerInteractionManager.class)
 public abstract class ServerPlayerInteractionManagerMixin {
 
-    @Shadow private ServerPlayerEntity player;
-    @Shadow private ServerWorld world;
+    @Shadow @Final private ServerPlayerEntity player;
+    @Shadow @Final private ServerWorld world;
 
     private static final HoshikimaConfig config = HoshikimaConfig.get();
 
     private static final int MAX_BLOCKS_TO_BREAK = config.blockChainLimit;
 
-    @Redirect(
+    @Inject(
             method = "tryBreakBlock",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/block/Block;afterBreak(Lnet/minecraft/world/World;Lnet/minecraft/entity/player/PlayerEntity;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/entity/BlockEntity;Lnet/minecraft/item/ItemStack;)V"
-            )
+            at = @At(value = "HEAD"),
+            cancellable = true
     )
-    private void onAfterBlockBroken(Block instance, World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack tool) {
+    private void onTryBreakBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        BlockState blockState = this.world.getBlockState(pos);
+        Block originalBlock = blockState.getBlock();
+        //originalBlock.afterBreak(this.world, this.player, pos, blockState, this.world.getBlockEntity(pos), this.player.getActiveItem());
         IChainMineState playerState = (IChainMineState) this.player;
         if (!playerState.isChainMiningActive()) {
-            instance.afterBreak(world, player, pos, state, blockEntity, tool);
             return;
         }
-
-        Block originalBlock = state.getBlock();
 
         ChainMineState.setChainMining(true);
         ChainMineState.clearCapturedDrops();
@@ -73,30 +75,33 @@ public abstract class ServerPlayerInteractionManagerMixin {
             ChainMineState.clearCapturedDrops();
             ChainMineState.clearCapturedXp();
         }
+        cir.setReturnValue(true);
+        cir.cancel();
     }
     
     private void breakPendingBlocks() {
-    IChainMineState state = (IChainMineState) this.player;
-    List<BlockPos> blocksToBreak = state.getPendingBreakList();
+        IChainMineState state = (IChainMineState) this.player;
+        List<BlockPos> blocksToBreak = state.getPendingBreakList();
 
-    if (blocksToBreak == null || blocksToBreak.isEmpty()) return;
+        if (blocksToBreak == null || blocksToBreak.isEmpty()) return;
 
-    int broken = 0;
-    ItemStack mainHandStack = this.player.getMainHandStack();
+        int broken = 0;
+        ItemStack mainHandStack = this.player.getMainHandStack();
 
-    for (BlockPos pos : blocksToBreak) {
-        if (broken >= MAX_BLOCKS_TO_BREAK) break;
-        if (mainHandStack.isDamageable() && mainHandStack.getDamage() >= mainHandStack.getMaxDamage() - 1) break;
+        for (BlockPos pos : blocksToBreak) {
+            if (broken >= MAX_BLOCKS_TO_BREAK) break;
+            if (mainHandStack.isDamageable() && mainHandStack.getDamage() + config.antiToolBreakValue >= mainHandStack.getMaxDamage() - 1) break;
+            if (this.world.getBlockState(pos).getHardness(world, pos) < 0 && !player.isCreative()) break;
 
-        this.world.breakBlock(pos, true, this.player);
+            this.world.breakBlock(pos, (!this.player.isCreative() && this.player.canHarvest(this.world.getBlockState(pos))), this.player);
 
-        if (!this.player.isCreative()) {
-            mainHandStack.postMine(this.world, this.world.getBlockState(pos), pos, this.player);
+            if (!player.isCreative()) {
+                mainHandStack.postMine(world, world.getBlockState(pos), pos, player);
+            }
+
+            broken++;
         }
 
-        broken++;
+        state.clearPendingBreakList();
     }
-
-    state.clearPendingBreakList();
-}
 }
