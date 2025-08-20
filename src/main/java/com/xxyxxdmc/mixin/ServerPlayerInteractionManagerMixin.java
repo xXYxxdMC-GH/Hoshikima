@@ -18,6 +18,7 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.network.ServerPlayerInteractionManager;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -90,7 +91,10 @@ public abstract class ServerPlayerInteractionManagerMixin {
 
         for (BlockPos pos : blocksToBreak) {
             if (broken > config.blockChainLimit) break;
-            if (mainHandStack.isDamageable() && mainHandStack.getDamage() + config.antiToolBreakValue >= mainHandStack.getMaxDamage() - 1) break;
+            if (mainHandStack.isDamageable() && mainHandStack.getDamage() + config.antiToolBreakValue >= mainHandStack.getMaxDamage() - 1) {
+                player.sendMessage(Text.translatable("massage.hoshikima.chain.mine.anti.tool.break"), true);
+                break;
+            }
             BlockState blockState = this.world.getBlockState(pos);
             if (blockState.getHardness(world, pos) < 0 && !player.isCreative()) break;
 

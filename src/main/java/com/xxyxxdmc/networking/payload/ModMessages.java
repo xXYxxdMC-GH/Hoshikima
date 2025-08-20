@@ -6,14 +6,9 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import java.util.*;
@@ -28,70 +23,85 @@ public class ModMessages {
         ServerPlayNetworking.registerGlobalReceiver(ChainMineKeyPressPayload.ID, (payload, context) -> {
             ServerPlayerEntity player = context.player();
             boolean isPressed = payload.isPressed();
-            Direction direction = Direction.byIndex(payload.direction());
 
             context.server().execute(() -> {
                 IChainMineState playerState = (IChainMineState) player;
                 playerState.setChainMiningActive(isPressed);
-                playerState.setDirection(direction);
             });
         });
 
-        ServerPlayNetworking.registerGlobalReceiver(QueryChainMineBlocksPacket.ID, (payload, context) -> {
-    context.server().execute(() -> {
-        ServerPlayerEntity player = context.player();
-        BlockPos startPos = payload.pos();
-        World world = player.getWorld();
-        BlockState startState = world.getBlockState(startPos);
+        ServerPlayNetworking.registerGlobalReceiver(QueryChainMineBlocksPacket.ID, (payload, context) -> context.server().execute(() -> {
+            ServerPlayerEntity player = context.player();
+            BlockPos startPos = payload.pos();
+            World world = player.getWorld();
 
-        if (startState.isAir() || (startState.getHardness(world, startPos) < 0 && !player.isCreative())) {
-            ServerPlayNetworking.send(player, new UpdateChainMineOutlinePacket(Collections.emptyList()));
-            return;
-        }
 
-        List<BlockPos> result = new ArrayList<>();
-        IChainMineState playerState = (IChainMineState) player;
+            boolean isPressed = payload.isPressed();
+            Direction direction = Direction.byIndex(payload.direction());
+            IChainMineState playerState = (IChainMineState) player;
+            playerState.setChainMiningActive(isPressed);
 
-        switch (config.chainMode) {
-            case 0 -> {
-                result = findConnectedBlocks(world, startPos, startState.getBlock());
-                result.addFirst(startPos);
+            if (!isPressed || startPos.equals(new BlockPos(0, 0, 0))) {
+                ServerPlayNetworking.send(player, new UpdateChainMineOutlinePacket(Collections.emptyList(), config.chainMode, 0));
+                return;
             }
-            case 1 -> {
-                Direction face = playerState.getDirection();
-                if (face == null) break;
 
-                Direction direction = face.getOpposite();
-                int dx = direction.getOffsetX();
-                int dy = direction.getOffsetY();
-                int dz = direction.getOffsetZ();
-                int airs = 0;
-                int totalAirs = 0;
-                for (int i = 0; i < config.blockChainLimit; i++) {
-                    BlockPos target = startPos.add(dx * i, dy * i, dz * i);
-                    BlockState state = world.getBlockState(target);
-                    if (state.isAir()) {
-                        if (airs < config.skipAirBlocksInOnce && totalAirs < config.skipAirBlocksInTotal) {
-                            airs++;
-                            totalAirs++;
-                            continue;
-                        } else break;
-                    } else airs = 0;
-                    if (state.getHardness(world, target) < 0 && !player.isCreative()) break;
-                    result.add(target);
+            BlockState startState = world.getBlockState(startPos);
+
+            if (startState.isAir() || (startState.getHardness(world, startPos) < 0 && !player.isCreative())) {
+                ServerPlayNetworking.send(player, new UpdateChainMineOutlinePacket(Collections.emptyList(), config.chainMode, 0));
+                return;
+            }
+
+            List<BlockPos> result = new ArrayList<>();
+
+            int airsInTotal = 0;
+
+            switch (config.chainMode) {
+                case 0 -> {
+                    result = findConnectedBlocks(world, startPos, startState.getBlock());
+                }
+                case 1 -> {
+                    if (direction == null) break;
+                    Direction face = direction.getOpposite();
+
+                    int dx = face.getOffsetX();
+                    int dy = face.getOffsetY();
+                    int dz = face.getOffsetZ();
+                    int airs = 0;
+                    int totalAirs = 0;
+                    for (int i = 0; i < config.blockChainLimit; i++) {
+                        BlockPos target = startPos.add(dx * i, dy * i, dz * i);
+                        BlockState state = world.getBlockState(target);
+                        if (state.isAir()) {
+                            if (airs < config.skipAirBlocksInOnce && totalAirs < config.skipAirBlocksInTotal) {
+                                airs++;
+                                totalAirs++;
+                                continue;
+                            } else break;
+                        } else airs = 0;
+                        if (state.getHardness(world, target) < 0 && !player.isCreative()) break;
+                        result.add(target);
+                    }
+                    airsInTotal = totalAirs;
+                }
+                default -> {
+                    result = Collections.emptyList();
                 }
             }
-            default -> {
-                result = Collections.emptyList();
-            }
-        }
 
-        playerState.setPendingBreakList(result);
+            playerState.setPendingBreakList(result);
 
-        ServerPlayNetworking.send(player, new UpdateChainMineOutlinePacket(result));
-    });
-});
-}
+            ServerPlayNetworking.send(
+                player,
+                new UpdateChainMineOutlinePacket(
+                    result,
+                    config.chainMode,
+                    airsInTotal
+                )
+            );
+        }));
+    }
 
     public static void registerS2CPayloads() {
         PayloadTypeRegistry.playS2C().register(UpdateChainMineOutlinePacket.ID, UpdateChainMineOutlinePacket.CODEC);
