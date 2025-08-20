@@ -22,7 +22,7 @@ public abstract class AxolotlEntityMixin extends AnimalEntity {
 
     @Inject(method = "interactMob", at = @At("HEAD"), cancellable = true)
     private void onInteractWithLargeBucket(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        ActionResult result = LargeBucketInteractionHelper.tryPickup(
+        @SuppressWarnings("DataFlowIssue") ActionResult result = LargeBucketInteractionHelper.tryPickup(
                 (AxolotlEntity) (Object) this,
                 player,
                 hand,

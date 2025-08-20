@@ -1,20 +1,19 @@
 package com.xxyxxdmc.init.plugin;
 
-import snownee.jade.api.IWailaClientRegistration;
-import snownee.jade.api.IWailaCommonRegistration;
-import snownee.jade.api.IWailaPlugin;
-import snownee.jade.api.WailaPlugin;
+import com.xxyxxdmc.Hoshikima;
+import net.minecraft.block.Block;
+import net.minecraft.util.Identifier;
+import snownee.jade.api.*;
 
 @WailaPlugin
-public class JadePlugin implements IWailaPlugin{
+public class JadePlugin implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
-            //TODO register data providers
-            //  
+        registration.registerBlockDataProvider(new ChainMineComponentProvider(), Block.class);
     }
 
-      @Override
-      public void registerClient(IWailaClientRegistration registration) {
-              //TODO register component providers, icon providers, callbacks, and config options here
-      }
+    @Override
+    public void registerClient(IWailaClientRegistration registration) {
+        registration.registerBlockComponent(new ChainMineComponentProvider(), Block.class);
+    }
 }

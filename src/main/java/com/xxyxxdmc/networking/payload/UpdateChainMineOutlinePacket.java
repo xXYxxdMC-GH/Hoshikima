@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 
-public record UpdateChainMineOutlinePacket(List<BlockPos> blocks) implements CustomPayload {
+public record UpdateChainMineOutlinePacket(List<BlockPos> blocks, int chainMode, int totalSkipAirs) implements CustomPayload {
     public static final CustomPayload.Id<UpdateChainMineOutlinePacket> ID =
             new CustomPayload.Id<>(Identifier.of(Hoshikima.MOD_ID, "update_chain_mine_outline"));
 
@@ -19,11 +19,17 @@ public record UpdateChainMineOutlinePacket(List<BlockPos> blocks) implements Cus
     );
 
     public UpdateChainMineOutlinePacket(PacketByteBuf buf) {
-        this(buf.readList(packetByteBuf -> packetByteBuf.readBlockPos()));
+        this(
+                buf.readList(packetByteBuf -> packetByteBuf.readBlockPos()),
+                buf.readInt(),
+                buf.readInt()
+        );
     }
 
     public void write(PacketByteBuf buf) {
         buf.writeCollection(this.blocks, (packetByteBuf, blockPos) -> packetByteBuf.writeBlockPos(blockPos));
+        buf.writeInt(this.chainMode);
+        buf.writeInt(this.totalSkipAirs);
     }
 
     @Override

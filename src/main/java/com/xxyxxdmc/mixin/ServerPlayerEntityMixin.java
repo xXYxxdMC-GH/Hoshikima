@@ -19,8 +19,6 @@ public abstract class ServerPlayerEntityMixin implements IChainMineState {
     private boolean chainMineActive = false;
     @Unique
     private List<BlockPos> pendingBreakList = null;
-    @Unique
-    private Direction direction = null;
 
     @Override
     public boolean isChainMiningActive() {
@@ -45,15 +43,5 @@ public abstract class ServerPlayerEntityMixin implements IChainMineState {
     @Override
     public void clearPendingBreakList() {
         this.pendingBreakList = null;
-    }
-
-    @Override
-    public Direction getDirection() {
-        return this.direction;
-    }
-
-    @Override
-    public void setDirection(Direction direction) {
-        this.direction = direction;
     }
 }

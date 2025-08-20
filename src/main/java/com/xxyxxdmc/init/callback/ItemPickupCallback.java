@@ -19,5 +19,5 @@ public interface ItemPickupCallback {
                 return ActionResult.PASS;
             });
 
-    ActionResult onItemPickup(PlayerEntity player, ItemEntity itemEntity, ItemStack stack); // 修正方法名和参数
+    ActionResult onItemPickup(PlayerEntity player, ItemEntity itemEntity, ItemStack stack);
 }

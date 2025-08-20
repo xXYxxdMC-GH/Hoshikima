@@ -39,6 +39,7 @@ public class HoshikimaConfig {
     public boolean enableExpGather = true;
     public int skipAirBlocksInOnce = 1;
     public int skipAirBlocksInTotal = 16;
+    public int hudDisplayWay = 0;
 
     public HoshikimaConfig() {}
 
@@ -59,6 +60,7 @@ public class HoshikimaConfig {
         this.enableExpGather = other.enableExpGather;
         this.skipAirBlocksInOnce = other.skipAirBlocksInOnce;
         this.skipAirBlocksInTotal = other.skipAirBlocksInTotal;
+        this.hudDisplayWay = other.hudDisplayWay;
     }
 
     public void apply(HoshikimaConfig other) {
@@ -78,6 +80,7 @@ public class HoshikimaConfig {
         this.enableExpGather = other.enableExpGather;
         this.skipAirBlocksInOnce = other.skipAirBlocksInOnce;
         this.skipAirBlocksInTotal = other.skipAirBlocksInTotal;
+        this.hudDisplayWay = other.hudDisplayWay;
     }
 
     public static synchronized HoshikimaConfig get() {

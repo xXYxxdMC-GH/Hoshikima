@@ -2,6 +2,7 @@ package com.xxyxxdmc.config;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.SliderWidget;
 import net.minecraft.screen.ScreenTexts;
@@ -72,14 +73,27 @@ public abstract class AbstractConfigScreen extends Screen {
 
     @Override
     public void close() {
+        assert this.client != null;
         this.client.setScreen(this.parent);
     }
 
     protected ButtonWidget createBooleanButton(String translationKey, Supplier<Boolean> getter, Consumer<Boolean> setter) {
+        return createBooleanButton(translationKey, getter, setter, null);
+    }
+
+    protected ButtonWidget createBooleanButton(String translationKey, Supplier<Boolean> getter, Consumer<Boolean> setter, String tooltip) {
         Text optionText = Text.translatable(translationKey);
         Supplier<Text> messageSupplier = () -> optionText.copy().append(": ").append(getter.get() ? ScreenTexts.ON : ScreenTexts.OFF);
 
-        return ButtonWidget.builder(
+        if (tooltip != null) return ButtonWidget.builder(
+                messageSupplier.get(),
+                button -> {
+                    boolean newValue = !getter.get();
+                    setter.accept(newValue);
+                    button.setMessage(messageSupplier.get());
+                }
+        ).width(150).tooltip(Tooltip.of(Text.translatable(tooltip))).build();
+        else return ButtonWidget.builder(
                 messageSupplier.get(),
                 button -> {
                     boolean newValue = !getter.get();
@@ -90,9 +104,20 @@ public abstract class AbstractConfigScreen extends Screen {
     }
 
     protected ButtonWidget createIntegerButton(String translationKey, Supplier<Integer> getter, Consumer<Integer> setter, List<Text> options) {
+        return createIntegerButton(translationKey, getter, setter, options, null);
+    }
+
+    protected ButtonWidget createIntegerButton(String translationKey, Supplier<Integer> getter, Consumer<Integer> setter, List<Text> options, String tootip) {
         Text optionText = Text.translatable(translationKey);
         Supplier<Text> messageSupplier = () -> optionText.copy().append(": ").append(options.get(getter.get()));
-        return ButtonWidget.builder(messageSupplier.get(),
+        if (tootip != null) return ButtonWidget.builder(messageSupplier.get(),
+                button -> {
+                    int newValue = (getter.get() + 1 >= options.size()) ? 0 : getter.get() + 1;
+                    setter.accept(newValue);
+                    button.setMessage(messageSupplier.get());
+                }
+        ).width(150).tooltip(Tooltip.of(Text.translatable(tootip))).build();
+        else return ButtonWidget.builder(messageSupplier.get(),
                 button -> {
                     int newValue = (getter.get() + 1 >= options.size()) ? 0 : getter.get() + 1;
                     setter.accept(newValue);
@@ -101,15 +126,20 @@ public abstract class AbstractConfigScreen extends Screen {
         ).width(150).build();
     }
     IntegerSliderWidget createSliderWidget(String translationKey, double max, double min, double value, HoshikimaConfig config, int mode) {
-        return new IntegerSliderWidget(Text.translatable(translationKey), value, max, min, config, mode);
+        return createSliderWidget(translationKey, max, min, value, config, mode, null);
+    }
+    IntegerSliderWidget createSliderWidget(String translationKey, double max, double min, double value, HoshikimaConfig config, int mode, String tooltip) {
+        IntegerSliderWidget widget = new IntegerSliderWidget(Text.translatable(translationKey), value, max, min, config, mode);
+        if (tooltip != null) widget.setTooltip(Tooltip.of(Text.translatable(tooltip)));
+        return widget;
     }
 }
 class IntegerSliderWidget extends SliderWidget {
-    private double max;
-    private double min;
-    private HoshikimaConfig config;
-    private int mode;
-    private Text text;
+    private final double max;
+    private final double min;
+    private final HoshikimaConfig config;
+    private final int mode;
+    private final Text text;
     public IntegerSliderWidget(Text text, double value, double max, double min, HoshikimaConfig config, int mode) {
         super(0, 0, 150, 20, text, (value - min) / (max - min));
         this.max = max;
