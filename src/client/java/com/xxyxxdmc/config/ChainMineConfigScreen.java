@@ -114,7 +114,7 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         adder.add(this.slider, 1);
 
         Text waysKey = switch (pendingConfig.hudDisplayWay) {
-            case 1 -> Hoshikima.hasJade ? Text.translatable("config.hoshikima.chain.mine.hud.way.jade").append(Text.of("Jade").copy().withColor(new Color(83, 255, 151).getRGB()).append(Text.of("❤").copy().withColor(new Color(255, 18, 18).getRGB()))) : Text.translatable("");
+            case 1 -> (Hoshikima.hasJade || pendingConfig.hudDisplayWay != 1) ? Text.translatable("config.hoshikima.chain.mine.hud.way.jade").append(Text.of("Jade").copy().withColor(new Color(83, 255, 151).getRGB()).append(Text.of("❤").copy().withColor(new Color(255, 18, 18).getRGB()))) : Text.translatable("config.hoshikima.chain.mine.hud.way.jade.not.found");
             default -> Text.translatable("config.hoshikima.chain.mine.hud.way.ftb");
         };
 
