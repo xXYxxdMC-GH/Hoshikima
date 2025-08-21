@@ -2,6 +2,7 @@ package com.xxyxxdmc.init.plugin;
 
 
 import com.xxyxxdmc.Hoshikima;
+import com.xxyxxdmc.config.HoshikimaConfig;
 import com.xxyxxdmc.init.api.IChainMineState;
 import com.xxyxxdmc.init.api.ISolidColorElementFactory;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,6 +26,8 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
 
     public static final Identifier COMPONENT_ID = Identifier.of(Hoshikima.MOD_ID, "chain_mine_info");
 
+    private static final HoshikimaConfig configGlobal = HoshikimaConfig.get();
+
     @Override
     public Identifier getUid() {
         return COMPONENT_ID;
@@ -43,36 +46,46 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
             Tooltip castedTooltip = (Tooltip) tooltip;
             List<Line> originalLines = castedTooltip.lines;
 
-            int maxWidth = 0;
-            for (Line line : originalLines) {
-                int line_width = (int) line.size().x;
-                if (line_width > maxWidth) {
-                    maxWidth = line_width;
+            if (!configGlobal.jadeLinkageOverwrite) {
+                int maxWidth = 0;
+                for (Line line : originalLines) {
+                    int line_width = (int) line.size().x;
+                    if (line_width > maxWidth) {
+                        maxWidth = line_width;
+                    }
                 }
-            }
 
-            List<Text> texts = new ArrayList<>();
+                List<Text> texts = new ArrayList<>();
 
-            for (int i = 0; i < originalLines.size(); i++) {
-                Line line = originalLines.get(i);
+                for (int i = 0; i < originalLines.size(); i++) {
+                    Line line = originalLines.get(i);
 
-                List<IElement> elements = line.sortedElements();
-                if (!elements.isEmpty() && elements.get(elements.size() - 1) instanceof ITextElement) {
+                    List<IElement> elements = line.sortedElements();
+                    if (!elements.isEmpty() && elements.get(elements.size() - 1) instanceof ITextElement) {
 
-                    int lineWidth = (int) line.size().x;
-                    int spacerWidth = maxWidth - lineWidth;
+                        int lineWidth = (int) line.size().x;
+                        int spacerWidth = maxWidth - lineWidth;
 
-                    IElement spacer = helper.spacer(spacerWidth + 3, 0);
-                    IElement verticalLine = factory.create(1, 5, 0xFFFFFFFF);
-                    ITextElement chainText = helper.text(Text.translatable("hud.hoshikima.chain.mine.skip.blocks.total")
-                            .formatted(Formatting.GOLD)
-                            .append(Text.literal(": " + skippedAirs).formatted(Formatting.WHITE)));
+                        IElement spacer = helper.spacer(spacerWidth + 3, 0);
+                        IElement verticalLine = factory.create(1, 5, 0xFFFFFFFF);
+                        ITextElement chainText = helper.text(Text.translatable("hud.hoshikima.chain.mine.skip.blocks.total")
+                                .formatted(Formatting.GOLD)
+                                .append(Text.literal(": " + skippedAirs).formatted(Formatting.WHITE)));
 
-                    tooltip.append(i, spacer);
-                    tooltip.append(i, verticalLine);
-                    tooltip.append(i, helper.spacer(3, 0));
-                    tooltip.append(i, chainText);
+                        tooltip.append(i, spacer);
+                        tooltip.append(i, verticalLine);
+                        tooltip.append(i, helper.spacer(3, 0));
+                        tooltip.append(i, chainText);
+                    }
                 }
+            } else {
+                tooltip.clear();
+
+                ITextElement blockName = helper.text(accessor.getBlockState().getBlock().getName().copy().formatted(Formatting.WHITE));
+                ITextElement chainText = helper.text(Text.literal("你的连锁采集信息").formatted(Formatting.GOLD));
+
+                tooltip.append(blockName);
+                tooltip.append(chainText);
             }
         }
     }
