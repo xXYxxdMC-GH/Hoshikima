@@ -19,8 +19,6 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import org.lwjgl.opengl.GL11;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -53,12 +51,7 @@ public class ChainMineOutlineRenderer {
 
             Matrix4f matrix = matrixStack.peek().getPositionMatrix();
 
-            for (Edge edge : collectExposedEdges(blocksToRender)) {
-                Vec3d from = edge.p1;
-                Vec3d to = edge.p2;
-                Vec3d[] adjusted = adjustLineEndpoints(from, to);
-                drawEdge(vertexConsumer, matrix, adjusted[0], adjusted[1], config.disableLineDeepTest);
-            }
+            for (Edge edge : collectExposedEdges(blocksToRender)) drawEdge(vertexConsumer, matrix, edge.p1, edge.p2, config.disableLineDeepTest);
 
             matrixStack.pop();
             ((VertexConsumerProvider.Immediate) vertexConsumers).draw();
@@ -99,7 +92,7 @@ public class ChainMineOutlineRenderer {
         pipelineBuilder.withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST);
 
         RenderLayer.MultiPhaseParameters.Builder parametersBuilder = RenderLayer.MultiPhaseParameters.builder();
-        parametersBuilder.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(2.0f)));
+        parametersBuilder.lineWidth(new RenderPhase.LineWidth(OptionalDouble.of(1.0f)));
         parametersBuilder.layering(RenderPhase.NO_LAYERING);
         parametersBuilder.lightmap(RenderPhase.DISABLE_LIGHTMAP);
         parametersBuilder.texture(RenderPhase.TextureBase.NO_TEXTURE);
@@ -113,13 +106,6 @@ public class ChainMineOutlineRenderer {
                 pipelineBuilder.build(),
                 parametersBuilder.build(false)
         );
-    }
-
-    private static Vec3d[] adjustLineEndpoints(Vec3d from, Vec3d to) {
-        Vec3d dir = to.subtract(from).normalize();
-        double scale = 0.002;
-        Vec3d offset = dir.multiply(scale);
-        return new Vec3d[]{from.add(offset), to.subtract(offset)};
     }
 
     private static Set<Edge> collectExposedEdges(Set<BlockPos> blocks) {
