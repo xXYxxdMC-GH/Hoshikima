@@ -39,6 +39,7 @@ public class HoshikimaConfig {
     public int skipAirBlocksInOnce = 1;
     public int skipAirBlocksInTotal = 16;
     public int hudDisplayWay = 0;
+    public boolean jadeLinkageOverwrite = false;
 
     public HoshikimaConfig() {}
 
@@ -60,6 +61,7 @@ public class HoshikimaConfig {
         this.skipAirBlocksInOnce = other.skipAirBlocksInOnce;
         this.skipAirBlocksInTotal = other.skipAirBlocksInTotal;
         this.hudDisplayWay = other.hudDisplayWay;
+        this.jadeLinkageOverwrite = other.jadeLinkageOverwrite;
     }
 
     public void apply(HoshikimaConfig other) {
@@ -80,6 +82,7 @@ public class HoshikimaConfig {
         this.skipAirBlocksInOnce = other.skipAirBlocksInOnce;
         this.skipAirBlocksInTotal = other.skipAirBlocksInTotal;
         this.hudDisplayWay = other.hudDisplayWay;
+        this.jadeLinkageOverwrite = other.jadeLinkageOverwrite;
     }
 
     public static synchronized HoshikimaConfig get() {

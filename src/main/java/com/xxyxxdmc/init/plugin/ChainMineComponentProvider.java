@@ -2,7 +2,8 @@ package com.xxyxxdmc.init.plugin;
 
 
 import com.xxyxxdmc.Hoshikima;
-import com.xxyxxdmc.init.callback.IChainMineState;
+import com.xxyxxdmc.init.api.IChainMineState;
+import com.xxyxxdmc.init.api.ISolidColorElementFactory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -14,12 +15,15 @@ import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.ui.IElement;
 import snownee.jade.api.ui.IElementHelper;
 import snownee.jade.api.ui.ITextElement;
+import snownee.jade.impl.Tooltip;
+import snownee.jade.impl.Tooltip.Line;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ChainMineComponentProvider implements IBlockComponentProvider, IServerDataProvider<BlockAccessor> {
 
     public static final Identifier COMPONENT_ID = Identifier.of(Hoshikima.MOD_ID, "chain_mine_info");
-
-    public static final Identifier VERTICAL_LINE_TEXTURE = Identifier.of(Hoshikima.MOD_ID, "textures/gui/line.png");
 
     @Override
     public Identifier getUid() {
@@ -29,31 +33,48 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         NbtCompound serverData = accessor.getServerData();
+        IElementHelper helper = IElementHelper.get();
+        ISolidColorElementFactory factory = Hoshikima.solidColorElementFactory;
 
-        if (serverData.contains("hoshikima.total_blocks")) {
+        if (serverData.contains("hoshikima.total_blocks") && factory != null) {
             int totalBlocks = serverData.getInt("hoshikima.total_blocks").get();
             int skippedAirs = serverData.getInt("hoshikima.skipped_airs").get();
 
-            ITextElement chainMineInfoText = createChainMineInfoElement(114, 514);
+            Tooltip castedTooltip = (Tooltip) tooltip;
+            List<Line> originalLines = castedTooltip.lines;
 
-            IElement verticalLine = IElementHelper.get().sprite(VERTICAL_LINE_TEXTURE, 1, 40);
+            int maxWidth = 0;
+            for (Line line : originalLines) {
+                int line_width = (int) line.size().x;
+                if (line_width > maxWidth) {
+                    maxWidth = line_width;
+                }
+            }
 
-            tooltip.append(verticalLine);
-            tooltip.append(chainMineInfoText);
+            List<Text> texts = new ArrayList<>();
+
+            for (int i = 0; i < originalLines.size(); i++) {
+                Line line = originalLines.get(i);
+
+                List<IElement> elements = line.sortedElements();
+                if (!elements.isEmpty() && elements.get(elements.size() - 1) instanceof ITextElement) {
+
+                    int lineWidth = (int) line.size().x;
+                    int spacerWidth = maxWidth - lineWidth;
+
+                    IElement spacer = helper.spacer(spacerWidth + 3, 0);
+                    IElement verticalLine = factory.create(1, 5, 0xFFFFFFFF);
+                    ITextElement chainText = helper.text(Text.translatable("hud.hoshikima.chain.mine.skip.blocks.total")
+                            .formatted(Formatting.GOLD)
+                            .append(Text.literal(": " + skippedAirs).formatted(Formatting.WHITE)));
+
+                    tooltip.append(i, spacer);
+                    tooltip.append(i, verticalLine);
+                    tooltip.append(i, helper.spacer(3, 0));
+                    tooltip.append(i, chainText);
+                }
+            }
         }
-    }
-
-    private ITextElement createChainMineInfoElement(int totalBlocks, int skippedAirs) {
-        IElementHelper helper = IElementHelper.get();
-        Text totalBlocksText = Text.translatable("hud.hoshikima.chain.mine.total.chain.block")
-                .formatted(Formatting.GOLD)
-                .append(Text.literal(": " + totalBlocks).formatted(Formatting.WHITE));
-        Text skippedAirsText = Text.translatable("hud.hoshikima.chain.mine.skip.blocks.total")
-                .formatted(Formatting.GOLD)
-                .append(Text.literal(": " + skippedAirs).formatted(Formatting.WHITE));
-        return helper.text(
-                totalBlocksText.copy().append("\n").append(skippedAirsText)
-        );
     }
 
     @Override

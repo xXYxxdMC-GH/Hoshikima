@@ -1,7 +1,7 @@
 package com.xxyxxdmc;
 
-import com.xxyxxdmc.jade.ChainMineHudRenderer;
-import com.xxyxxdmc.networking.payload.ChainMineKeyPressPayload;
+import com.xxyxxdmc.jade.SolidColorElement;
+import com.xxyxxdmc.jade.SolidColorElementFactory;
 import com.xxyxxdmc.networking.payload.UpdateChainMineOutlinePacket;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
@@ -46,9 +46,8 @@ public class HoshikimaClient implements ClientModInitializer {
             skippedAirs = payload.totalSkipAirs();
         }));
 		ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
-
 		HudRenderCallback.EVENT.register(this::onHudRender);
-		HudRenderCallback.EVENT.register(ChainMineHudRenderer::render);
+		Hoshikima.solidColorElementFactory = new SolidColorElementFactory();
 	}
 
 	private void onHudRender(DrawContext context, RenderTickCounter tickCounter) {

@@ -1,7 +1,7 @@
 package com.xxyxxdmc.networking.payload;
 
 import com.xxyxxdmc.config.HoshikimaConfig;
-import com.xxyxxdmc.init.callback.IChainMineState;
+import com.xxyxxdmc.init.api.IChainMineState;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;

@@ -5,22 +5,22 @@ import net.minecraft.client.gui.DrawContext;
 
 /**
  * @author Snownee
- * @modifier xXYxxdMC
- * @source https://github.com/Snownee/Jade
- * @license CC BY-NC-SA 4.0 International
- * @description This code block is adapted and modified from the original work.
- * @note This portion remains under the original license and is intended for non-commercial use only.
-*/
+ * @author xXYxxdMC
+ * @Source Github <a href="https://github.com/Snownee/Jade">...</a>
+ * @License CC BY-NC-SA 4.0 International
+ * @Description  This code block is adapted and modified from the original work.
+ * @Note  This portion remains under the original license and is intended for non-commercial use only.
+ */
 public class JadeSnowflakeParticle {
     public float age;
-    private String text;
+    private final String text;
     private float x;
     public float y;
     private float motionX;
     private float motionY;
-    private int color;
-    private float scale;
-    private float friction = 0.98F;
+    private final int color;
+    private final float scale;
+    private final float friction = 0.98F;
     public float gravity = 0.98F;
     public boolean needToStop = false;
     public boolean needHasAlpha = false;

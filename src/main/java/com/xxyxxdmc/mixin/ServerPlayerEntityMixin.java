@@ -1,14 +1,11 @@
 package com.xxyxxdmc.mixin;
 
-import com.xxyxxdmc.init.callback.IChainMineState;
+import com.xxyxxdmc.init.api.IChainMineState;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
-
-import static com.xxyxxdmc.init.ModDataComponents.register;
 
 import java.util.List;
 

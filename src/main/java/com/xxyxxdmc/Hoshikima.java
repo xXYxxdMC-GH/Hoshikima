@@ -4,27 +4,17 @@ import com.xxyxxdmc.config.HoshikimaConfig;
 import com.xxyxxdmc.init.ModDataComponents;
 import com.xxyxxdmc.init.ModEnchantments;
 import com.xxyxxdmc.init.ModItem;
-import com.xxyxxdmc.init.callback.IChainMineState;
+import com.xxyxxdmc.init.api.ISolidColorElementFactory;
 import com.xxyxxdmc.init.callback.ItemPickupCallback;
 import com.xxyxxdmc.init.recipe.ModRecipe;
-import com.xxyxxdmc.networking.payload.ChainMineKeyPressPayload;
 import com.xxyxxdmc.networking.payload.ModMessages;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.stat.Stats;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
-import org.apache.commons.logging.Log;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import static com.xxyxxdmc.init.ModDataComponents.COUNT;
@@ -32,7 +22,7 @@ import static com.xxyxxdmc.init.ModDataComponents.COUNT;
 public class Hoshikima implements ModInitializer {
 	public static final String MOD_ID = "hoshikima";
 	public static final Identifier CHAIN_MINE_PACKET_ID = Identifier.of(MOD_ID, "chain_mine_key_state");
-	public static final Identifier DIRECTION_PACKET_ID = Identifier.of(MOD_ID, "direction_packet");
+	public static ISolidColorElementFactory solidColorElementFactory;
 	public static final Logger LOGGER = Logger.getLogger("Hoshikima");
 
 	@Override

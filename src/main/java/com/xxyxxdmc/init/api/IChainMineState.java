@@ -1,9 +1,8 @@
-package com.xxyxxdmc.init.callback;
+package com.xxyxxdmc.init.api;
 
 import java.util.List;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
 
 public interface IChainMineState {
     boolean isChainMiningActive();
