@@ -4,8 +4,13 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 /**
- * @author snownee
- * */
+ * @author Snownee
+ * @modifier xXYxxdMC
+ * @source https://github.com/Snownee/Jade
+ * @license CC BY-NC-SA 4.0 International
+ * @description This code block is adapted and modified from the original work.
+ * @note This portion remains under the original license and is intended for non-commercial use only.
+*/
 public class JadeSnowflakeParticle {
     public float age;
     private String text;
