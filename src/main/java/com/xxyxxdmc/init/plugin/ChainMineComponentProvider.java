@@ -19,6 +19,7 @@ import snownee.jade.api.ui.ITextElement;
 import snownee.jade.impl.Tooltip;
 import snownee.jade.impl.Tooltip.Line;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,12 +40,22 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
         IElementHelper helper = IElementHelper.get();
         ISolidColorElementFactory factory = Hoshikima.solidColorElementFactory;
 
+        //⛏🔱🗡🏹❤🔥
         if (serverData.contains("hoshikima.total_blocks") && factory != null) {
             int totalBlocks = serverData.getInt("hoshikima.total_blocks").get();
             int skippedAirs = serverData.getInt("hoshikima.skipped_airs").get();
+            boolean ableBreak = serverData.getBoolean("hoshikima.able_break").get();
 
             Tooltip castedTooltip = (Tooltip) tooltip;
             List<Line> originalLines = castedTooltip.lines;
+
+            List<Text> texts = new ArrayList<>();
+            texts.add(Text.translatable("hud.hoshikima.chain.mine.state").append(": ").append(!ableBreak ? Text.translatable("hud.hoshikima.chain.mine.inactive").formatted(Formatting.DARK_RED) : Text.translatable("hud.hoshikima.chain.mine.active").formatted(Formatting.GREEN)));
+            texts.add(Text.translatable("config.hoshikima.chain.mine.chain.mode").append(": ").append(Text.translatable(getCurrentChainMode(configGlobal.chainMode))));
+            if (ableBreak) {
+                texts.add(Text.translatable("hud.hoshikima.chain.mine.total.chain.block").append(": ").append(String.valueOf(totalBlocks)));
+                if (skippedAirs != 0) texts.add(Text.translatable("hud.hoshikima.chain.mine.skip.blocks.total").append(": ").append(String.valueOf(skippedAirs)));
+            }
 
             if (!configGlobal.jadeLinkageOverwrite) {
                 int maxWidth = 0;
@@ -55,23 +66,28 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
                     }
                 }
 
-                List<Text> texts = new ArrayList<>();
+                for (int i = 0; i < texts.size(); i++) {
+                    if (i < originalLines.size()) {
+                        Line line = originalLines.get(i);
+                        List<IElement> elements = line.sortedElements();
 
-                for (int i = 0; i < originalLines.size(); i++) {
-                    Line line = originalLines.get(i);
+                        if (!elements.isEmpty() && elements.get(elements.size() - 1) instanceof ITextElement) {
+                            int lineWidth = (int) line.size().x;
+                            int spacerWidth = maxWidth - lineWidth;
 
-                    List<IElement> elements = line.sortedElements();
-                    if (!elements.isEmpty() && elements.get(elements.size() - 1) instanceof ITextElement) {
+                            IElement spacer = helper.spacer(spacerWidth + 3, 0);
+                            IElement verticalLine = factory.create(1, 9, Color.GRAY.getRGB());
+                            ITextElement chainText = helper.text(texts.get(i));
 
-                        int lineWidth = (int) line.size().x;
-                        int spacerWidth = maxWidth - lineWidth;
-
-                        IElement spacer = helper.spacer(spacerWidth + 3, 0);
-                        IElement verticalLine = factory.create(1, 5, 0xFFFFFFFF);
-                        ITextElement chainText = helper.text(Text.translatable("hud.hoshikima.chain.mine.skip.blocks.total")
-                                .formatted(Formatting.GOLD)
-                                .append(Text.literal(": " + skippedAirs).formatted(Formatting.WHITE)));
-
+                            tooltip.append(i, spacer);
+                            tooltip.append(i, verticalLine);
+                            tooltip.append(i, helper.spacer(3, 0));
+                            tooltip.append(i, chainText);
+                        }
+                    } else {
+                        IElement spacer = helper.spacer(maxWidth + 3, 0);
+                        IElement verticalLine = factory.create(1, 9, Color.GRAY.getRGB());
+                        ITextElement chainText = helper.text(texts.get(i));
                         tooltip.append(i, spacer);
                         tooltip.append(i, verticalLine);
                         tooltip.append(i, helper.spacer(3, 0));
@@ -80,27 +96,34 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
                 }
             } else {
                 tooltip.clear();
-
-                ITextElement blockName = helper.text(accessor.getBlockState().getBlock().getName().copy().formatted(Formatting.WHITE));
-                ITextElement chainText = helper.text(Text.literal("你的连锁采集信息").formatted(Formatting.GOLD));
-
-                tooltip.append(blockName);
-                tooltip.append(chainText);
+                for (int i = 0; i < texts.size(); i++) {
+                    tooltip.append(i, helper.text(texts.get(i)));
+                }
             }
         }
     }
 
     @Override
     public void appendServerData(NbtCompound data, BlockAccessor accessor) {
+        if (configGlobal.hudDisplayWay != 1) return;
         PlayerEntity player = accessor.getPlayer();
         if (player instanceof ServerPlayerEntity serverPlayer) {
             if (serverPlayer instanceof IChainMineState chainMineState && chainMineState.isChainMiningActive()) {
                 int totalBlocks = chainMineState.getPendingBreakList().size();
-                int skippedAirs = chainMineState.getPendingBreakList().size();
+                int skippedAirs = chainMineState.getTotalSkipAirs();
+                boolean ableBreak = chainMineState.enableBreak();
 
                 data.putInt("hoshikima.total_blocks", totalBlocks);
                 data.putInt("hoshikima.skipped_airs", skippedAirs);
+                data.putBoolean("hoshikima.able_break", ableBreak);
             }
         }
+    }
+
+    private String getCurrentChainMode(int mode) {
+        return switch (mode) {
+            case 1 -> "config.hoshikima.chain.mine.mode.two";
+            default -> "config.hoshikima.chain.mine.mode.one";
+        };
     }
 }

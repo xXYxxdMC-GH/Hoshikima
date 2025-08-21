@@ -46,6 +46,6 @@
 		"fabric-api": "*"
 	},
 	"suggests": {
-		"another-mod": "*"
+		"jade": "*"
 	}
 }

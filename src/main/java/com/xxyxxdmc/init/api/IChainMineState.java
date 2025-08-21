@@ -10,4 +10,8 @@ public interface IChainMineState {
     void setPendingBreakList(List<BlockPos> blocks);
     List<BlockPos> getPendingBreakList();
     void clearPendingBreakList();
+    int getTotalSkipAirs();
+    void setTotalSkipAirs(int airs);
+    boolean enableBreak();
+    void setAbleBreak(boolean able);
 }

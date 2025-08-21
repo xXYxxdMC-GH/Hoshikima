@@ -16,6 +16,10 @@ public abstract class ServerPlayerEntityMixin implements IChainMineState {
     private boolean chainMineActive = false;
     @Unique
     private List<BlockPos> pendingBreakList = null;
+    @Unique
+    private int totalSkipAirs = 0;
+    @Unique
+    private boolean ableBreak = false;
 
     @Override
     public boolean isChainMiningActive() {
@@ -40,5 +44,25 @@ public abstract class ServerPlayerEntityMixin implements IChainMineState {
     @Override
     public void clearPendingBreakList() {
         this.pendingBreakList = null;
+    }
+
+    @Override
+    public int getTotalSkipAirs() {
+        return this.totalSkipAirs;
+    }
+
+    @Override
+    public void setTotalSkipAirs(int airs) {
+        this.totalSkipAirs = airs;
+    }
+
+    @Override
+    public boolean enableBreak() {
+        return this.ableBreak;
+    }
+
+    @Override
+    public void setAbleBreak(boolean ableBreak) {
+        this.ableBreak = ableBreak;
     }
 }

@@ -3,6 +3,7 @@ package com.xxyxxdmc.config;
 import java.awt.*;
 import java.util.ArrayList;
 
+import com.xxyxxdmc.Hoshikima;
 import com.xxyxxdmc.jade.JadeSnowflakeParticle;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -113,7 +114,7 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         adder.add(this.slider, 1);
 
         Text waysKey = switch (pendingConfig.hudDisplayWay) {
-            case 1 -> Text.translatable("config.hoshikima.chain.mine.hud.way.jade").append(Text.of("Jade").copy().withColor(new Color(206, 255, 225).getRGB()).append(Text.of("❤").copy().withColor(new Color(255, 118, 195).getRGB())));
+            case 1 -> Hoshikima.hasJade ? Text.translatable("config.hoshikima.chain.mine.hud.way.jade").append(Text.of("Jade").copy().withColor(new Color(83, 255, 151).getRGB()).append(Text.of("❤").copy().withColor(new Color(255, 18, 18).getRGB()))) : Text.translatable("");
             default -> Text.translatable("config.hoshikima.chain.mine.hud.way.ftb");
         };
 
@@ -121,10 +122,10 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
             pendingConfig.hudDisplayWay++;
             if (pendingConfig.hudDisplayWay > 1) pendingConfig.hudDisplayWay = 0;
             Text newWaysKey = switch (pendingConfig.hudDisplayWay) {
-                case 1 -> Text.translatable("config.hoshikima.chain.mine.hud.way.jade").append(Text.of("Jade ").copy().withColor(new Color(206, 255, 225).getRGB()).append(Text.of("❤").copy().withColor(new Color(255, 118, 195).getRGB())));
+                case 1 -> Text.translatable("config.hoshikima.chain.mine.hud.way.jade").append(Text.of("Jade ").copy().withColor(new Color(83, 255, 151).getRGB()).append(Text.of("❤").copy().withColor(new Color(255, 18, 18).getRGB())));
                 default -> Text.translatable("config.hoshikima.chain.mine.hud.way.ftb");
             };
-            b.setMessage(Text.translatable("config.hoshikima.chain.mine.hud.way").append(": ").append(newWaysKey));
+            b.setMessage((Hoshikima.hasJade || pendingConfig.hudDisplayWay != 1) ? Text.translatable("config.hoshikima.chain.mine.hud.way").append(": ").append(newWaysKey) : newWaysKey);
         }).width(150).build(), 1);
 
         gridWidget.refreshPositions();
@@ -136,7 +137,7 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
         if (slider != null && !slider.isHovered()) slider.setTooltip(Tooltip.of(Text.translatable("config.hoshikima.chain.mine.limit.tooltip")));
-        if (pendingConfig.hudDisplayWay == 1 && lastStyle != 1) {
+        if (pendingConfig.hudDisplayWay == 1 && lastStyle != 1 && Hoshikima.hasJade) {
             shouldGenerateParticles = true;
         }
         if (pendingConfig.lineColor == 8 && lastColor != 8) {
@@ -156,7 +157,7 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
                 float initialMotionX = (i > 7 ? 1.0f : -1.0f) * random.nextFloat() * 2.0f;
 
                 float startX = (float) this.width / 2 + 75 + random.nextBetween(-75, 75);
-                float startY = (float) this.height / 2 + 20;
+                float startY = (float) this.height / 2 + 15;
 
                 JadeSnowflakeParticle particle = new JadeSnowflakeParticle(
                         "❄",

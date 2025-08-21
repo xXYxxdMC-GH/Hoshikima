@@ -2,6 +2,7 @@ package com.xxyxxdmc;
 
 import com.xxyxxdmc.jade.SolidColorElement;
 import com.xxyxxdmc.jade.SolidColorElementFactory;
+import com.xxyxxdmc.networking.payload.ChangeChainModePacket;
 import com.xxyxxdmc.networking.payload.UpdateChainMineOutlinePacket;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
@@ -15,12 +16,14 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 
@@ -32,6 +35,7 @@ public class HoshikimaClient implements ClientModInitializer {
 	public static int currentChainMode = 0;
 	public static int totalChainBlocks = 0;
 	public static int skippedAirs = 0;
+	private static double scrollAmount = 0.0;
 	private static final HoshikimaConfig config = HoshikimaConfig.get();
 
 	@Override
@@ -46,14 +50,23 @@ public class HoshikimaClient implements ClientModInitializer {
             skippedAirs = payload.totalSkipAirs();
         }));
 		ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
+//		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+//			boolean isChainMinePressed = HoshikimaKeyBind.CHAIN_MINE_KEY.isPressed();
+//			boolean isShiftPressed = InputUtil.isKeyPressed(client.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT);
+//
+//			if (isChainMinePressed && isShiftPressed) {
+//				ClientPlayNetworking.send(new ChangeChainModePacket(scrollAmount > 0));
+//				scrollAmount = 0;
+//			}
+//		});
 		HudRenderCallback.EVENT.register(this::onHudRender);
-		Hoshikima.solidColorElementFactory = new SolidColorElementFactory();
+		if (Hoshikima.hasJade) Hoshikima.solidColorElementFactory = new SolidColorElementFactory();
 	}
 
 	private void onHudRender(DrawContext context, RenderTickCounter tickCounter) {
 		MinecraftClient client = MinecraftClient.getInstance();
 
-		if (client.player == null || !HoshikimaKeyBind.CHAIN_MINE_KEY.isPressed() || config.hudDisplayWay == 0) {
+		if (client.player == null || !HoshikimaKeyBind.CHAIN_MINE_KEY.isPressed() || config.hudDisplayWay != 0) {
 			return;
 		}
 
@@ -61,7 +74,7 @@ public class HoshikimaClient implements ClientModInitializer {
 
 		Text line1, line2, line3, line4;
 
-		line1 = Text.translatable("hud.hoshikima.chain.mine.state").append(": ").append(state ? Text.translatable("hud.hoshikima.chain.mine.disable").formatted(Formatting.DARK_RED) : Text.translatable("hud.hoshikima.chain.mine.enable").formatted(Formatting.GREEN));
+		line1 = Text.translatable("hud.hoshikima.chain.mine.state").append(": ").append(state ? Text.translatable("hud.hoshikima.chain.mine.inactive").formatted(Formatting.DARK_RED) : Text.translatable("hud.hoshikima.chain.mine.active").formatted(Formatting.GREEN));
 
 		line2 = Text.translatable("config.hoshikima.chain.mine.chain.mode").append(": ").append(Text.translatable(getCurrentChainMode(currentChainMode)));
 

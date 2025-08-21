@@ -9,6 +9,8 @@ import com.xxyxxdmc.init.callback.ItemPickupCallback;
 import com.xxyxxdmc.init.recipe.ModRecipe;
 import com.xxyxxdmc.networking.payload.ModMessages;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.stat.Stats;
@@ -23,6 +25,7 @@ public class Hoshikima implements ModInitializer {
 	public static final String MOD_ID = "hoshikima";
 	public static final Identifier CHAIN_MINE_PACKET_ID = Identifier.of(MOD_ID, "chain_mine_key_state");
 	public static ISolidColorElementFactory solidColorElementFactory;
+	public static boolean hasJade = false;
 	public static final Logger LOGGER = Logger.getLogger("Hoshikima");
 
 	@Override
@@ -72,6 +75,8 @@ public class Hoshikima implements ModInitializer {
 
 		ModMessages.registerC2SPayloads();
 		ModMessages.registerS2CPayloads();
+
+		hasJade = FabricLoader.getInstance().isModLoaded("jade");
 
 		// TODO: Add Data pack in mod.
 		// var modContainer = FabricLoader.getInstance()

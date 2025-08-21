@@ -50,8 +50,11 @@ public class ModMessages {
 
             if (startState.isAir() || (startState.getHardness(world, startPos) < 0 && !player.isCreative())) {
                 ServerPlayNetworking.send(player, new UpdateChainMineOutlinePacket(Collections.emptyList(), config.chainMode, 0));
+                playerState.setAbleBreak(false);
                 return;
             }
+
+            playerState.setAbleBreak(true);
 
             List<BlockPos> result = new ArrayList<>();
 
@@ -60,6 +63,7 @@ public class ModMessages {
             switch (config.chainMode) {
                 case 0 -> {
                     result = findConnectedBlocks(world, startPos, startState.getBlock());
+                    playerState.setTotalSkipAirs(0);
                 }
                 case 1 -> {
                     if (direction == null) break;
@@ -84,9 +88,11 @@ public class ModMessages {
                         result.add(target);
                     }
                     airsInTotal = totalAirs;
+                    playerState.setTotalSkipAirs(totalAirs);
                 }
                 default -> {
                     result = Collections.emptyList();
+                    playerState.setTotalSkipAirs(0);
                 }
             }
 
