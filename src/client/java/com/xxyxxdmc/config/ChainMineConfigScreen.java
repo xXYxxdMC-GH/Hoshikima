@@ -20,9 +20,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ChainMineConfigScreen extends AbstractConfigScreen {
     private IntegerSliderWidget slider;
+    private ButtonWidget button;
     private final Random random = Random.create();
     private final List<JadeSnowflakeParticle> particles = new ArrayList<>();
     private int lastStyle;
@@ -41,39 +43,52 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         GridWidget.Adder adder = gridWidget.createAdder(2);
 
         adder.add(createBooleanButton("config.hoshikima.category.chain.mine", () -> pendingConfig.enableChainMine, value -> pendingConfig.enableChainMine = value));
-        List<Text> chainModeText = new ArrayList<>();
-        chainModeText.add(Text.translatable("config.hoshikima.chain.mine.mode.one"));
-        chainModeText.add(Text.translatable("config.hoshikima.chain.mine.mode.two"));
-        adder.add(createIntegerButton("config.hoshikima.chain.mine.chain.mode", () -> pendingConfig.chainMode, value -> pendingConfig.chainMode = value, chainModeText, "config.hoshikima.chain.mine.chain.mode.tooltip"), 1);
+
+        List<Text> chainModeTexts = List.of(
+                Text.translatable("config.hoshikima.chain.mine.mode.one"),
+                Text.translatable("config.hoshikima.chain.mine.mode.two"),
+                Text.translatable("config.hoshikima.chain.mine.mode.three"),
+                Text.translatable("config.hoshikima.chain.mine.mode.four")
+        );
+
+        this.button = ButtonWidget.builder(Text.translatable("config.hoshikima.chain.mine.chain.mode").append(Text.of(": ")).append(chainModeTexts.get(pendingConfig.chainMode)),
+                b -> {
+                    if (pendingConfig.chainMode + 1 > chainModeTexts.size() - 1) pendingConfig.chainMode = 0;
+                    else pendingConfig.chainMode++;
+                    b.setMessage(Text.translatable("config.hoshikima.chain.mine.chain.mode").append(Text.of(": ")).append(chainModeTexts.get(pendingConfig.chainMode)));
+                    b.setTooltip(Tooltip.of(Text.translatable("config.hoshikima.chain.mine.chain.mode.tooltip").append(Text.translatable("tooltip.hoshikima.detail"))));
+                }).width(150).build();
+
+        adder.add(this.button, 1);
+
         adder.add(createBooleanButton("config.hoshikima.chain.mine.exp.gather", () -> pendingConfig.enableExpGather, value -> pendingConfig.enableExpGather = value, "config.hoshikima.chain.mine.exp.gather.tooltip"));
 
-        List<String> keys = List.of(
-            "red", "green", "blue", "yellow", "purple", "cyan", "white", "black"
+        List<String> colorKeys = List.of(
+                "red", "green", "blue", "yellow", "purple", "cyan", "white", "black"
         );
-        List<Text> colorTexts = new ArrayList<>();
-        for (String key: keys) colorTexts.add(Text.translatable("config.hoshikima.chain.mine.color." + key).withColor(CommonValue.colors.get(keys.indexOf(key))));   
-        colorTexts.add(Text.of("ホシノの色").copy().withColor(CommonValue.colors.getLast()));
+        List<Integer> colorValues = CommonValue.colors;
+
+        List<Text> colorTexts = colorKeys.stream()
+                .map(key -> Text.translatable("config.hoshikima.chain.mine.color." + key).withColor(colorValues.get(colorKeys.indexOf(key))))
+                .collect(Collectors.toList());
+
+        colorTexts.add(Text.of("ホシノの色").copy().withColor(colorValues.getLast()));
 
         adder.add(createIntegerButton(
-                "config.hoshikima.chain.mine.color", 
-                () -> pendingConfig.lineColor , 
+                "config.hoshikima.chain.mine.color",
+                () -> pendingConfig.lineColor,
                 value -> pendingConfig.lineColor = value, colorTexts));
 
         adder.add(createBooleanButton("config.hoshikima.chain.mine.disable.deep.test",
                 () -> pendingConfig.disableLineDeepTest,
                 value -> pendingConfig.disableLineDeepTest = value,
-                "config.hoshikima.chain.mine.disable.deep.test.tooltip"),1);
+                "config.hoshikima.chain.mine.disable.deep.test.tooltip"), 1);
 
         adder.add(createSliderWidget("config.hoshikima.chain.mine.skip.blocks", 8, 0, pendingConfig.skipAirBlocksInOnce, pendingConfig, 0, "config.hoshikima.chain.mine.skip.blocks.tooltip"), 1);
-
         adder.add(createSliderWidget("config.hoshikima.chain.mine.skip.blocks.total", 64, 8, pendingConfig.skipAirBlocksInTotal, pendingConfig, 1, "config.hoshikima.chain.mine.skip.blocks.total.tooltip"), 1);
-
         adder.add(createSliderWidget("config.hoshikima.chain.mine.tool.save", 512, 0, pendingConfig.antiToolBreakValue, pendingConfig, 2, "config.hoshikima.chain.mine.tool.save.tooltip"), 1);
 
         this.slider = new IntegerSliderWidget(Text.translatable("config.hoshikima.chain.mine.limit"), pendingConfig.blockChainLimit, 2048, 1, pendingConfig, 3) {
-            {
-                setTooltip(Tooltip.of(Text.translatable("config.hoshikima.chain.mine.limit.tooltip")));
-            }
             @Override
             public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
                 if (this.isHovered()) {
@@ -93,9 +108,7 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
                     }
 
                     double deltaValue = (verticalAmount * step) / (2048 - 1);
-                    this.value += deltaValue;
-
-                    this.value = MathHelper.clamp(this.value, 0.0, 1.0);
+                    this.value = MathHelper.clamp(this.value + deltaValue, 0.0, 1.0);
 
                     this.updateMessage();
                     this.applyValue();
@@ -104,6 +117,7 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
                 }
                 return false;
             }
+
             @Override
             protected void updateMessage() {
                 if (this.value == 1.0) this.setMessage(Text.translatable("config.hoshikima.chain.mine.limit.max"));
@@ -113,30 +127,48 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         };
         adder.add(this.slider, 1);
 
-        Text waysKey = switch (pendingConfig.hudDisplayWay) {
-            case 1 -> Hoshikima.hasJade ? Text.translatable("config.hoshikima.chain.mine.hud.way.jade").append(Text.of("Jade").copy().withColor(new Color(83, 255, 151).getRGB()).append(Text.of("❤").copy().withColor(new Color(255, 18, 18).getRGB()))) : Text.translatable("");
-            default -> Text.translatable("config.hoshikima.chain.mine.hud.way.ftb");
-        };
+        Text waysKey = getHudDisplayWayText(pendingConfig.hudDisplayWay);
 
-        adder.add(ButtonWidget.builder(Text.translatable("config.hoshikima.chain.mine.hud.way").append(": ").append(waysKey), b -> {
+        adder.add(ButtonWidget.builder(waysKey, b -> {
             pendingConfig.hudDisplayWay++;
             if (pendingConfig.hudDisplayWay > 1) pendingConfig.hudDisplayWay = 0;
-            Text newWaysKey = switch (pendingConfig.hudDisplayWay) {
-                case 1 -> Text.translatable("config.hoshikima.chain.mine.hud.way.jade").append(Text.of("Jade ").copy().withColor(new Color(83, 255, 151).getRGB()).append(Text.of("❤").copy().withColor(new Color(255, 18, 18).getRGB())));
-                default -> Text.translatable("config.hoshikima.chain.mine.hud.way.ftb");
-            };
-            b.setMessage((Hoshikima.hasJade || pendingConfig.hudDisplayWay != 1) ? Text.translatable("config.hoshikima.chain.mine.hud.way").append(": ").append(newWaysKey) : newWaysKey);
-        }).width(150).build(), 1);
+            b.setMessage(getHudDisplayWayText(pendingConfig.hudDisplayWay));
+        }).width(150).tooltip(Tooltip.of(Text.translatable("config.hoshikima.chain.mine.hud.way.tooltip"))).build(), 1);
 
         gridWidget.refreshPositions();
-        SimplePositioningWidget.setPos(gridWidget, 0, 32, this.width, this.height, 0.5f, 0.0f); 
+        SimplePositioningWidget.setPos(gridWidget, 0, 32, this.width, this.height, 0.5f, 0.0f);
         gridWidget.forEachChild(this::addDrawableChild);
+    }
+
+    private Text getHudDisplayWayText(int way) {
+        return switch (way) {
+            case 1 -> {
+                if (Hoshikima.hasJade) {
+                    yield Text.translatable("config.hoshikima.chain.mine.hud.way.jade")
+                            .append(Text.of("Jade").copy().withColor(new Color(83, 255, 151).getRGB()))
+                            .append(Text.of("❤").copy().withColor(new Color(255, 18, 18).getRGB()));
+                }
+                yield Text.translatable("config.hoshikima.chain.mine.hud.way.jade.not.found");
+            }
+            default -> Text.translatable("config.hoshikima.chain.mine.hud.way.ftb");
+        };
     }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
+        List<Text> chainModeTooltips = List.of(
+                Text.translatable("config.hoshikima.chain.mine.mode.one.tooltip"),
+                Text.translatable("config.hoshikima.chain.mine.mode.two.tooltip"),
+                Text.translatable("config.hoshikima.chain.mine.mode.three.tooltip"),
+                Text.translatable("config.hoshikima.chain.mine.mode.four.tooltip")
+        );
         if (slider != null && !slider.isHovered()) slider.setTooltip(Tooltip.of(Text.translatable("config.hoshikima.chain.mine.limit.tooltip")));
+        if (button != null) {
+            if (button.isHovered() && Screen.hasShiftDown())
+                button.setTooltip(Tooltip.of(chainModeTooltips.get(pendingConfig.chainMode)));
+            else button.setTooltip(Tooltip.of(Text.translatable("config.hoshikima.chain.mine.chain.mode.tooltip").append(Text.translatable("tooltip.hoshikima.detail"))));
+        }
         if (pendingConfig.hudDisplayWay == 1 && lastStyle != 1 && Hoshikima.hasJade) {
             shouldGenerateParticles = true;
         }
@@ -153,7 +185,7 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
                 int color = 0x00ADD8E6;
                 color |= (alpha << 24);
 
-                float initialMotionY = -4.0f - random.nextFloat() * 1.5f;
+                float initialMotionY = -5.0f - random.nextFloat() * 1.5f;
                 float initialMotionX = (i > 7 ? 1.0f : -1.0f) * random.nextFloat() * 2.0f;
 
                 float startX = (float) this.width / 2 + 75 + random.nextBetween(-75, 75);
@@ -166,10 +198,10 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
                         initialMotionX,
                         initialMotionY,
                         color,
-                        0.5F + (random.nextFloat() * 0.6F)
+                        0.7F + (random.nextFloat() * 0.6F)
                 );
 
-                particle.gravity = 0.6F;
+                particle.gravity = 0.9F;
 
                 particles.add(particle);
             }

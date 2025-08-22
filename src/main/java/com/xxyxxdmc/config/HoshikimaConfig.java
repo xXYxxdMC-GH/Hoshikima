@@ -31,7 +31,7 @@ public class HoshikimaConfig {
     public int textTooltipDetailLevel = 1;
     public boolean enableChainMine = true;
     public int chainMode = 0;
-    public boolean disableLineDeepTest = false;
+    public boolean disableLineDeepTest = true;
     public int lineColor = 6;
     public int blockChainLimit = 64;
     public int antiToolBreakValue = 0;

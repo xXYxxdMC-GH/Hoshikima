@@ -4,9 +4,10 @@ import com.xxyxxdmc.Hoshikima;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 
 public record ChainMineKeyPressPayload(boolean isPressed, int direction) implements CustomPayload {
-    public static final CustomPayload.Id<ChainMineKeyPressPayload> ID = new CustomPayload.Id<>(Hoshikima.CHAIN_MINE_PACKET_ID);
+    public static final CustomPayload.Id<ChainMineKeyPressPayload> ID = new CustomPayload.Id<>(Identifier.of(Hoshikima.MOD_ID, "chain_mine_key_state"));
 
     public static final PacketCodec<PacketByteBuf, ChainMineKeyPressPayload> CODEC = PacketCodec.of(
             ChainMineKeyPressPayload::write,

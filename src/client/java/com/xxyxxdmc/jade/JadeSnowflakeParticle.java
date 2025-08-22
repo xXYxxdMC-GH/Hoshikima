@@ -6,7 +6,7 @@ import net.minecraft.client.gui.DrawContext;
 /**
  * @author Snownee
  * @author xXYxxdMC
- * @Source Github <a href="https://github.com/Snownee/Jade">...</a>
+ * @Source Github <a href="https://github.com/Snownee/Jade/blob/1.21.6-fabric/src/main/java/snownee/jade/gui/HomeConfigScreen.java">...</a>
  * @License CC BY-NC-SA 4.0 International
  * @Description  This code block is adapted and modified from the original work.
  * @Note  This portion remains under the original license and is intended for non-commercial use only.

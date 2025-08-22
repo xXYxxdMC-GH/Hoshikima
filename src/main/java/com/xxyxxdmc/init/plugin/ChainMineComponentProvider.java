@@ -123,6 +123,8 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
     private String getCurrentChainMode(int mode) {
         return switch (mode) {
             case 1 -> "config.hoshikima.chain.mine.mode.two";
+            case 2 -> "config.hoshikima.chain.mine.mode.three";
+            case 3 -> "config.hoshikima.chain.mine.mode.four";
             default -> "config.hoshikima.chain.mine.mode.one";
         };
     }

@@ -1,9 +1,9 @@
 package com.xxyxxdmc;
 
-import com.xxyxxdmc.jade.SolidColorElement;
 import com.xxyxxdmc.jade.SolidColorElementFactory;
-import com.xxyxxdmc.networking.payload.ChangeChainModePacket;
+import com.xxyxxdmc.networking.payload.ChangeChainModePayload;
 import com.xxyxxdmc.networking.payload.UpdateChainMineOutlinePacket;
+import com.xxyxxdmc.networking.payload.UpdateChainModePayload;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 
@@ -33,9 +33,9 @@ public class HoshikimaClient implements ClientModInitializer {
 	private boolean lastIsChainKeyDown = false;
 	private Direction lastDirection = null;
 	public static int currentChainMode = 0;
+	public static int lastChainMode = 0;
 	public static int totalChainBlocks = 0;
 	public static int skippedAirs = 0;
-	private static double scrollAmount = 0.0;
 	private static final HoshikimaConfig config = HoshikimaConfig.get();
 
 	@Override
@@ -50,15 +50,13 @@ public class HoshikimaClient implements ClientModInitializer {
             skippedAirs = payload.totalSkipAirs();
         }));
 		ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
-//		ClientTickEvents.END_CLIENT_TICK.register(client -> {
-//			boolean isChainMinePressed = HoshikimaKeyBind.CHAIN_MINE_KEY.isPressed();
-//			boolean isShiftPressed = InputUtil.isKeyPressed(client.getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_SHIFT);
-//
-//			if (isChainMinePressed && isShiftPressed) {
-//				ClientPlayNetworking.send(new ChangeChainModePacket(scrollAmount > 0));
-//				scrollAmount = 0;
-//			}
-//		});
+		ClientPlayNetworking.registerGlobalReceiver(UpdateChainModePayload.ID, (payload, context) -> {
+			int newMode = payload.newMode();
+
+			context.client().execute(() -> {
+				currentChainMode = newMode;
+			});
+		});
 		HudRenderCallback.EVENT.register(this::onHudRender);
 		if (Hoshikima.hasJade) Hoshikima.solidColorElementFactory = new SolidColorElementFactory();
 	}
@@ -115,6 +113,8 @@ public class HoshikimaClient implements ClientModInitializer {
 	private String getCurrentChainMode(int mode) {
 		return switch (mode) {
 			case 1 -> "config.hoshikima.chain.mine.mode.two";
+			case 2 -> "config.hoshikima.chain.mine.mode.three";
+			case 3 -> "config.hoshikima.chain.mine.mode.four";
 			default -> "config.hoshikima.chain.mine.mode.one";
 		};
 	}
@@ -137,7 +137,8 @@ public class HoshikimaClient implements ClientModInitializer {
 
 		boolean isStatusChanged = isChainKeyDown != lastIsChainKeyDown ||
 				!Objects.equals(currentTargetPos, lastQueriedPos) ||
-				!Objects.equals(currentDirection, lastDirection);
+				!Objects.equals(currentDirection, lastDirection) ||
+				lastChainMode != currentChainMode;
 
 		if (!isStatusChanged) {
 			return;
@@ -146,6 +147,7 @@ public class HoshikimaClient implements ClientModInitializer {
 		lastIsChainKeyDown = isChainKeyDown;
 		lastQueriedPos = currentTargetPos;
 		lastDirection = currentDirection;
+		lastChainMode = currentChainMode;
 
 		if (isChainKeyDown && currentTargetPos != null) {
 			int directionIndex = currentDirection != null ? currentDirection.getIndex() : -1;
