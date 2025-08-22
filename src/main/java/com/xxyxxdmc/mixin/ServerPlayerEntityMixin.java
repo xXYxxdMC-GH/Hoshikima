@@ -3,7 +3,6 @@ package com.xxyxxdmc.mixin;
 import com.xxyxxdmc.init.api.IChainMineState;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 

@@ -3,7 +3,7 @@ package com.xxyxxdmc.config;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.GridWidget;
-import net.minecraft.client.gui.widget.SimplePositioningWidget; 
+import net.minecraft.client.gui.widget.SimplePositioningWidget;
 import net.minecraft.text.Text;
 
 public class FeatureConfigScreen extends AbstractConfigScreen {

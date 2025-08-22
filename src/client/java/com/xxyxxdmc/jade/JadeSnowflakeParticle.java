@@ -20,7 +20,6 @@ public class JadeSnowflakeParticle {
     private float motionY;
     private final int color;
     private final float scale;
-    private final float friction = 0.98F;
     public float gravity = 0.98F;
     public boolean needToStop = false;
     public boolean needHasAlpha = false;
@@ -52,6 +51,7 @@ public class JadeSnowflakeParticle {
         this.y += this.motionY * partialTicks;
         this.motionY += this.gravity * partialTicks;
         if (needToStop) {
+            float friction = 0.98F;
             motionX *= friction;
             motionY *= friction;
         }

@@ -1,8 +1,5 @@
 package com.xxyxxdmc.config;
 
-import java.awt.*;
-import java.util.ArrayList;
-
 import com.xxyxxdmc.Hoshikima;
 import com.xxyxxdmc.jade.JadeSnowflakeParticle;
 import net.minecraft.client.MinecraftClient;
@@ -13,12 +10,13 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.gui.widget.SimplePositioningWidget;
 import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.client.sound.SoundManager;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 
+import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

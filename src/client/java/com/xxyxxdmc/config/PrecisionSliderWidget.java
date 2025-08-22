@@ -1,7 +1,5 @@
 package com.xxyxxdmc.config;
 
-import java.util.function.Consumer;
-
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Element;
@@ -13,6 +11,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
+
+import java.util.function.Consumer;
 
 public class PrecisionSliderWidget extends ClickableWidget implements Element {
     double mainValue;

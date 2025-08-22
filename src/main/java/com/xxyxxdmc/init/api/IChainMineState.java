@@ -1,8 +1,8 @@
 package com.xxyxxdmc.init.api;
 
-import java.util.List;
-
 import net.minecraft.util.math.BlockPos;
+
+import java.util.List;
 
 public interface IChainMineState {
     boolean isChainMiningActive();

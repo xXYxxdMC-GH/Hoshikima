@@ -1,29 +1,25 @@
 package com.xxyxxdmc;
 
-import com.xxyxxdmc.jade.SolidColorElementFactory;
-import com.xxyxxdmc.networking.payload.ChangeChainModePayload;
-import com.xxyxxdmc.networking.payload.UpdateChainMineOutlinePacket;
-import com.xxyxxdmc.networking.payload.UpdateChainModePayload;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.minecraft.client.MinecraftClient;
-
 import com.xxyxxdmc.config.HoshikimaConfig;
+import com.xxyxxdmc.jade.SolidColorElementFactory;
 import com.xxyxxdmc.key.HoshikimaKeyBind;
 import com.xxyxxdmc.networking.payload.QueryChainMineBlocksPacket;
+import com.xxyxxdmc.networking.payload.UpdateChainMineOutlinePacket;
+import com.xxyxxdmc.networking.payload.UpdateChainModePayload;
 import com.xxyxxdmc.render.ChainMineOutlineRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
-import net.minecraft.client.util.InputUtil;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 

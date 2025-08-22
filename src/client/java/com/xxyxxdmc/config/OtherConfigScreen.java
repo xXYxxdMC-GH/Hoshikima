@@ -1,14 +1,11 @@
 package com.xxyxxdmc.config;
 
 import com.xxyxxdmc.jade.JadeTextMouseGlint;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.gui.widget.SimplePositioningWidget;
-import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 public class OtherConfigScreen extends AbstractConfigScreen {
     public OtherConfigScreen(Screen parent, HoshikimaConfig pendingConfig) {

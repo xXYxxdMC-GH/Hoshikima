@@ -3,7 +3,7 @@
 	"id": "hoshikima",
 	"version": "${version}",
 	"name": "Hoshikima",
-	"description": "This is a simple mod which add some useful things.",
+	"description": "Hoshikima adds a versatile chain mining system and other useful features to make your survival experience more efficient.",
 	"authors": [
 		"xXYxxdMC"
 	],
@@ -12,7 +12,7 @@
 		"sources": "https://github.com/xXYxxdMC-GH/Hoshikima",
 		"issues": "https://github.com/xXYxxdMC-GH/Hoshikima/issues"
 	},
-	"license": "CC0-1.0",
+	"license": "CC-BY-NC-SA-4.0",
 	"icon": "assets/hoshikima/icon.png",
 	"environment": "*",
 	"entrypoints": {

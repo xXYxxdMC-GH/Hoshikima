@@ -1,6 +1,6 @@
 package com.xxyxxdmc.config;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.List;
 
 public class CommonValue {

@@ -19,11 +19,8 @@ import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.OptionalDouble;
-import java.util.Set;
+
+import java.util.*;
 
 public class ChainMineOutlineRenderer {
 

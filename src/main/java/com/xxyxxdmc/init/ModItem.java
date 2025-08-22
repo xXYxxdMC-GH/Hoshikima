@@ -1,19 +1,16 @@
 package com.xxyxxdmc.init;
 
 import com.xxyxxdmc.Hoshikima;
-import com.xxyxxdmc.config.HoshikimaConfig;
 import com.xxyxxdmc.init.item.EnderPearlBundle;
 import com.xxyxxdmc.init.item.FireworkThruster;
 import com.xxyxxdmc.init.item.LargeBucket;
 import com.xxyxxdmc.init.item.MultiFluidBucket;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 

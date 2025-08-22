@@ -1,9 +1,10 @@
 package com.xxyxxdmc.init.plugin;
 
-import com.xxyxxdmc.Hoshikima;
 import net.minecraft.block.Block;
-import net.minecraft.util.Identifier;
-import snownee.jade.api.*;
+import snownee.jade.api.IWailaClientRegistration;
+import snownee.jade.api.IWailaCommonRegistration;
+import snownee.jade.api.IWailaPlugin;
+import snownee.jade.api.WailaPlugin;
 
 @WailaPlugin
 public class JadePlugin implements IWailaPlugin {

@@ -10,12 +10,10 @@ import com.xxyxxdmc.init.recipe.ModRecipe;
 import com.xxyxxdmc.networking.payload.ModMessages;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
 
 import java.util.logging.Logger;
 
