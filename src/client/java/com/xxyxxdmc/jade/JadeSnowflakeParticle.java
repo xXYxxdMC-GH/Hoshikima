@@ -44,7 +44,7 @@ public class JadeSnowflakeParticle {
         this.motionY = motionY;
         this.color = color;
         this.scale = scale;
-        this.age = 100;
+        this.age = 300;
     }
 
     public void tick(float partialTicks) {

@@ -42,7 +42,7 @@ public class ChainMineConfigScreen extends AbstractConfigScreen {
         gridWidget.getMainPositioner().margin(4, 4, 4, 0);
         GridWidget.Adder adder = gridWidget.createAdder(2);
 
-        adder.add(createBooleanButton("config.hoshikima.category.chain.mine", () -> pendingConfig.enableChainMine, value -> pendingConfig.enableChainMine = value));
+        adder.add(createBooleanButton("config.hoshikima.chain.mine.enable", () -> pendingConfig.enableChainMine, value -> pendingConfig.enableChainMine = value));
 
         List<Text> chainModeTexts = List.of(
                 Text.translatable("config.hoshikima.chain.mine.mode.one"),
