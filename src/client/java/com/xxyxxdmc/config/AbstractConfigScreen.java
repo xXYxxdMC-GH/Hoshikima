@@ -107,16 +107,16 @@ public abstract class AbstractConfigScreen extends Screen {
         return createIntegerButton(translationKey, getter, setter, options, null);
     }
 
-    protected ButtonWidget createIntegerButton(String translationKey, Supplier<Integer> getter, Consumer<Integer> setter, List<Text> options, String tootip) {
+    protected ButtonWidget createIntegerButton(String translationKey, Supplier<Integer> getter, Consumer<Integer> setter, List<Text> options, String tooltip) {
         Text optionText = Text.translatable(translationKey);
         Supplier<Text> messageSupplier = () -> optionText.copy().append(": ").append(options.get(getter.get()));
-        if (tootip != null) return ButtonWidget.builder(messageSupplier.get(),
+        if (tooltip != null) return ButtonWidget.builder(messageSupplier.get(),
                 button -> {
                     int newValue = (getter.get() + 1 >= options.size()) ? 0 : getter.get() + 1;
                     setter.accept(newValue);
                     button.setMessage(messageSupplier.get());
                 }
-        ).width(150).tooltip(Tooltip.of(Text.translatable(tootip))).build();
+        ).width(150).tooltip(Tooltip.of(Text.translatable(tooltip))).build();
         else return ButtonWidget.builder(messageSupplier.get(),
                 button -> {
                     int newValue = (getter.get() + 1 >= options.size()) ? 0 : getter.get() + 1;

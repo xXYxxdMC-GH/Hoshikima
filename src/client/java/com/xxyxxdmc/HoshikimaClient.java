@@ -1,6 +1,11 @@
 package com.xxyxxdmc;
 
 import com.xxyxxdmc.config.HoshikimaConfig;
+import com.xxyxxdmc.init.item.EnderPearlBundle;
+import com.xxyxxdmc.init.item.FireworkThruster;
+import com.xxyxxdmc.init.item.LargeBucket;
+import com.xxyxxdmc.init.item.MultiFluidBucket;
+import com.xxyxxdmc.init.item.client.LargeBucketTooltip;
 import com.xxyxxdmc.jade.SolidColorElementFactory;
 import com.xxyxxdmc.key.HoshikimaKeyBind;
 import com.xxyxxdmc.networking.payload.QueryChainMineBlocksPacket;
@@ -9,21 +14,28 @@ import com.xxyxxdmc.networking.payload.UpdateChainModePayload;
 import com.xxyxxdmc.render.ChainMineOutlineRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
+import java.awt.*;
 import java.util.Objects;
 
-@SuppressWarnings({"unused", "deprecated"})
+import static com.xxyxxdmc.init.ModDataComponents.*;
+import static net.minecraft.util.Colors.GRAY;
+
+@SuppressWarnings("unused")
 public class HoshikimaClient implements ClientModInitializer {
 	private BlockPos lastQueriedPos = null;
 	private boolean lastIsChainKeyDown = false;
@@ -36,6 +48,79 @@ public class HoshikimaClient implements ClientModInitializer {
 
 	@Override
 	public void onInitializeClient() {
+		ItemTooltipCallback.EVENT.register((stack, context, type, lines) -> {
+			if (config.enableEnderPearlBundle && stack.getItem() instanceof EnderPearlBundle item) {
+                int currentCount = item.getEnderPearlCount(stack);
+				int maxCount = item.getMaxCount();
+
+				lines.add(Text.translatable("tooltip.hoshikima.count")
+						.append(Text.literal(": " + currentCount + " / " + maxCount))
+						.formatted(Formatting.GRAY));
+			}
+			if (config.enableFireworkThruster && stack.getItem() instanceof FireworkThruster item) {
+				int currentFuel = item.getFuel(stack);
+				int power = stack.getOrDefault(POWER, 1);
+				boolean missingPaper = stack.getOrDefault(MISSING_PAPER, true);
+
+				if (!missingPaper) {
+					lines.add(Text.translatable("tooltip.hoshikima.fuel")
+							.append(Text.literal(": " + currentFuel + " / " + FireworkThruster.maxFuel))
+							.formatted(Formatting.GRAY));
+
+					lines.add(Text.translatable("tooltip.hoshikima.power")
+							.append(Text.literal(": " + power))
+							.formatted(Formatting.GRAY));
+				} else {
+					lines.add(Text.translatable("tooltip.hoshikima.missing_paper")
+							.formatted(Formatting.RED));
+				}
+			}
+			if (config.enableLargeBucket && stack.getItem() instanceof LargeBucket) LargeBucketTooltip.append(stack, lines);
+			if (config.enableMultiFluidBucket && stack.getItem() instanceof MultiFluidBucket) {
+				int fillType = stack.getOrDefault(FILL_TYPE, 0);
+				int mode = stack.getOrDefault(MODE, 1);
+				int spare = stack.getOrDefault(SPARE_CAPACITY, 0);
+				lines.add(Text.translatable("tooltip.hoshikima.state")
+						.append(": ")
+						.append(Text.translatable("tooltip.hoshikima.water")
+								.withColor((fillType == 1 || fillType == 4 || fillType == 5 || fillType == 7) ?
+										new Color(0, 116, 216).getRGB() : GRAY))
+						.append("/")
+						.append(Text.translatable("tooltip.hoshikima.lava")
+								.withColor((fillType == 2 || fillType == 4 || fillType == 6 || fillType == 7) ?
+										new Color(221, 76, 0).getRGB() : GRAY))
+						.append("/")
+						.append(Text.translatable("tooltip.hoshikima.powder_snow")
+								.withColor((fillType == 3 || fillType == 5 || fillType == 6 || fillType == 7) ?
+										new Color(255, 255, 255).getRGB() : GRAY))
+						.append("/")
+						.append(Text.translatable("tooltip.hoshikima.spare")
+								.withColor(spare == 0 ?
+										new Color(168, 168, 168).getRGB() : spare == 1 ?
+										new Color(0, 116, 216).getRGB() : spare == 2 ?
+										new Color(221, 76, 0).getRGB() :
+										new Color(255, 255, 255).getRGB())
+						)
+				);
+				lines.add(Text.translatable("tooltip.hoshikima.mode")
+						.append(": ")
+						.append(Text.translatable("tooltip.hoshikima." + (mode == 1 ? "water" :
+										(mode == 2 ? "lava" : (mode == 3 ? "powder_snow" : "spare"))))
+								.withColor((mode == 1 ? new Color(0, 116, 216).getRGB() :
+										(mode == 2 ? new Color(221, 76, 0).getRGB() :
+												(mode == 3 ? new Color(255, 255, 255).getRGB() :
+														new Color(168, 168, 168).getRGB()))))
+								.append((mode != 4) ? "" : "(")
+								.append((mode != 4) ? Text.empty() : (spare == 0) ?
+										Text.translatable("tooltip.hoshikima.empty").formatted(Formatting.GRAY) : spare == 1 ?
+										Text.translatable("tooltip.hoshikima.water").withColor(new Color(0, 116, 216).getRGB()) : spare == 2 ?
+										Text.translatable("tooltip.hoshikima.lava").withColor(new Color(221, 76, 0).getRGB()) :
+										Text.translatable("tooltip.hoshikima.powder_snow"))
+								.append((mode != 4) ? "" : ")")
+						)
+				);
+			}
+		});
 		if (!config.enableChainMine) return;
 		HoshikimaKeyBind.register();
 		ChainMineOutlineRenderer.init();
@@ -49,11 +134,9 @@ public class HoshikimaClient implements ClientModInitializer {
 		ClientPlayNetworking.registerGlobalReceiver(UpdateChainModePayload.ID, (payload, context) -> {
 			int newMode = payload.newMode();
 
-			context.client().execute(() -> {
-				currentChainMode = newMode;
-			});
+			context.client().execute(() -> currentChainMode = newMode);
 		});
-		HudRenderCallback.EVENT.register(this::onHudRender);
+		HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> layeredDrawer.attachLayerAfter(IdentifiedLayer.SUBTITLES, Identifier.of(Hoshikima.MOD_ID, "chain_mine_hud"), this::onHudRender));
 		if (Hoshikima.hasJade) Hoshikima.solidColorElementFactory = new SolidColorElementFactory();
 	}
 

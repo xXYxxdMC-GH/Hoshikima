@@ -7,7 +7,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(FireworkRocketEntity.class)
 public interface FireworkAccessor {
     @Accessor("lifeTime")
-    int getLifeTime();
-    @Accessor("lifeTime")
     void setLifeTime(int lifeTime);
 }

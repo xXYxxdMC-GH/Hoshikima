@@ -2,7 +2,6 @@ package com.xxyxxdmc.init.item;
 
 import com.xxyxxdmc.init.ModDataComponents;
 import com.xxyxxdmc.mixin.FireworkAccessor;
-import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FireworkRocketEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -10,7 +9,6 @@ import net.minecraft.inventory.StackReference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -18,18 +16,17 @@ import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ClickType;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.awt.*;
-import java.util.function.Consumer;
 
 import static com.xxyxxdmc.init.ModDataComponents.*;
 
+@SuppressWarnings("DataFlowIssue")
 public class FireworkThruster extends Item {
-    private final int maxFuel = 192;
+    public static final int maxFuel = 192;
 
     public FireworkThruster(Settings settings) {
         super(settings.maxCount(1));
@@ -38,7 +35,7 @@ public class FireworkThruster extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.set(ModDataComponents.FUEL, this.maxFuel);
+        stack.set(ModDataComponents.FUEL, maxFuel);
         return stack;
     }
 
@@ -59,7 +56,7 @@ public class FireworkThruster extends Item {
             if (world instanceof ServerWorld serverWorld) {
                 FireworkRocketEntity entity = new FireworkRocketEntity(world, Items.FIREWORK_ROCKET.getDefaultStack(), user);
                 int lifeTime = 10 * power + Random.create().nextInt(6) + Random.create().nextInt(7);
-               ((FireworkAccessor) entity).setLifeTime(lifeTime);
+                ((FireworkAccessor) entity).setLifeTime(lifeTime);
                 ProjectileEntity.spawn(entity, serverWorld, itemStack);
                 itemStack.set(FUEL, currentFuel - power);
                 user.incrementStat(Stats.USED.getOrCreateStat(this));
@@ -76,13 +73,13 @@ public class FireworkThruster extends Item {
             if (!stack.getOrDefault(MISSING_PAPER, true) && !otherStack.isOf(Items.PAPER)) {
                 int currentFuel = stack.getOrDefault(FUEL, 0);
                 if (otherStack.isOf(Items.GUNPOWDER)) {
-                    if (currentFuel + 3 <= this.maxFuel) {
+                    if (currentFuel + 3 <= maxFuel) {
                         otherStack.decrement(1);
                         stack.set(FUEL, currentFuel + 3);
                         if (Math.random() < 0.03) stack.set(MISSING_PAPER, true);
                     }
                 } else if (otherStack.isOf(Items.COAL)) {
-                    if (currentFuel + 5 <= this.maxFuel) {
+                    if (currentFuel + 5 <= maxFuel) {
                         otherStack.decrement(1);
                         stack.set(FUEL, currentFuel + 5);
                         if (Math.random() < 0.1) stack.set(MISSING_PAPER, true);
@@ -112,31 +109,11 @@ public class FireworkThruster extends Item {
 
     @Override
     public int getItemBarStep(ItemStack stack) {
-        return Math.round(13.0F * getFuel(stack) / (float) this.maxFuel);
+        return Math.round(13.0F * getFuel(stack) / (float) maxFuel);
     }
 
     @Override
     public int getItemBarColor(ItemStack stack) {
         return new Color(0, 232, 189).getRGB();
-    }
-
-    @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
-        int currentFuel = getFuel(stack);
-        int power = stack.getOrDefault(POWER, 1);
-        boolean missingPaper = stack.getOrDefault(MISSING_PAPER, true);
-
-        if (!missingPaper) {
-            textConsumer.accept(Text.translatable("tooltip.hoshikima.fuel")
-                    .append(Text.literal(": " + currentFuel + " / " + this.maxFuel))
-                    .formatted(Formatting.GRAY));
-
-            textConsumer.accept(Text.translatable("tooltip.hoshikima.power")
-                    .append(Text.literal(": " + power))
-                    .formatted(Formatting.GRAY));
-        } else textConsumer.accept(Text.translatable("tooltip.hoshikima.missing_paper")
-                .formatted(Formatting.RED));
-
-        super.appendTooltip(stack, context, displayComponent, textConsumer, type);
     }
 }

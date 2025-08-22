@@ -1,11 +1,8 @@
 package com.xxyxxdmc.init.item;
 
 import com.xxyxxdmc.init.other.LargeBucketEcoSystem;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
-import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.*;
 import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,7 +13,6 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
@@ -41,7 +37,6 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import static com.xxyxxdmc.init.ModDataComponents.*;
 
@@ -344,7 +339,7 @@ public class LargeBucket extends Item {
             return false;
         }
 
-        if (world.getDimension().ultrawarm() && fluid.isIn(FluidTags.WATER)) {
+        if (world.getDimension().ultrawarm() && fluid.getDefaultState().isIn(FluidTags.WATER)) {
             world.playSound(player, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
             releaseContents(world, stack, pos);
             for (int l = 0; l < 8; ++l) {
@@ -353,7 +348,7 @@ public class LargeBucket extends Item {
             return true;
         }
 
-        if (!world.isClient && blockState.isReplaceable() && !blockState.isLiquid()) {
+        if (!world.isClient && blockState.isReplaceable() && !blockState.getFluidState().isEmpty()) {
             world.breakBlock(pos, true);
         }
 
@@ -438,7 +433,7 @@ public class LargeBucket extends Item {
     }
 
     protected void playEmptyingSound(@Nullable PlayerEntity user, WorldAccess world, BlockPos pos, Fluid fluid) {
-        world.playSound(user, pos, fluid.isIn(FluidTags.WATER) ? SoundEvents.ITEM_BUCKET_EMPTY : SoundEvents.ITEM_BUCKET_EMPTY_LAVA, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        world.playSound(user, pos, fluid.getDefaultState().isIn(FluidTags.WATER) ? SoundEvents.ITEM_BUCKET_EMPTY : SoundEvents.ITEM_BUCKET_EMPTY_LAVA, SoundCategory.BLOCKS, 1.0F, 1.0F);
         world.emitGameEvent(user, GameEvent.FLUID_PLACE, pos);
     }
 
@@ -507,12 +502,5 @@ public class LargeBucket extends Item {
             case 3 -> new Color(255,255,255).getRGB();
             default -> 0x000000;
         };
-    }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    @SuppressWarnings("deprecation")
-    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
-        super.appendTooltip(stack, context, displayComponent, textConsumer, type);
     }
 }

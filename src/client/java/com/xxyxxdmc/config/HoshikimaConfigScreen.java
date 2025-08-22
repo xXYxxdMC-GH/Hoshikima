@@ -47,7 +47,11 @@ public class HoshikimaConfigScreen extends AbstractConfigScreen {
 
         ButtonWidget itemButton = ButtonWidget.builder(
                         Text.translatable("config.hoshikima.category.items"),
-                        button -> this.client.setScreen(new ItemConfigScreen(this, this.pendingConfig))
+                        button -> {
+                            if (this.client != null) {
+                                this.client.setScreen(new ItemConfigScreen(this, this.pendingConfig));
+                            }
+                        }
                 )
                 .width(100)
                 .tooltip(Tooltip.of(Text.translatable("config.hoshikima.category.items.tooltip")))
@@ -55,7 +59,11 @@ public class HoshikimaConfigScreen extends AbstractConfigScreen {
 
         ButtonWidget featureButton = ButtonWidget.builder(
                         Text.translatable("config.hoshikima.category.features"),
-                        button -> this.client.setScreen(new FeatureConfigScreen(this, this.pendingConfig))
+                        button -> {
+                            if (this.client != null) {
+                                this.client.setScreen(new FeatureConfigScreen(this, this.pendingConfig));
+                            }
+                        }
                 )
                 .width(100)
                 .tooltip(Tooltip.of(Text.translatable("config.hoshikima.category.features.tooltip")))
@@ -87,17 +95,19 @@ public class HoshikimaConfigScreen extends AbstractConfigScreen {
 
                 if (mouseX >= left && mouseX <= right && mouseY >= TITLE_Y && mouseY <= bottom) {
                     final String url = "https://www.curseforge.com/minecraft/mc-mods/hoshikima";
-                    this.client.setScreen(new ConfirmLinkScreen(confirmed -> {
-                        if (confirmed) {
-                            try {
-                                Util.getOperatingSystem().open(new URI(url));
-                            } catch (URISyntaxException e) {
-                                e.printStackTrace();
+                    if (this.client != null) {
+                        this.client.setScreen(new ConfirmLinkScreen(confirmed -> {
+                            if (confirmed) {
+                                try {
+                                    Util.getOperatingSystem().open(new URI(url));
+                                } catch (URISyntaxException e) {
+                                    System.out.println(e.getMessage());
+                                }
                             }
-                        }
-                        this.client.setScreen(this);
-                    }, url, true));
-                    this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                            this.client.setScreen(this);
+                        }, url, true));
+                        this.client.getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                    }
                     return true;
                 }
             }

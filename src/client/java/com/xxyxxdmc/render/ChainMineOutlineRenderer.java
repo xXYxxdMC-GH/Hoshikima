@@ -193,8 +193,4 @@ public class ChainMineOutlineRenderer {
     public static void setBlocksToRender(List<BlockPos> blocks) {
         MinecraftClient.getInstance().execute(() -> blocksToRender = (blocks == null || blocks.isEmpty()) ? Collections.emptySet() : new HashSet<>(blocks));
     }
-
-    public static void clear() {
-        MinecraftClient.getInstance().execute(() -> blocksToRender = Collections.emptySet());
-    }
 }

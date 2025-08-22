@@ -74,7 +74,7 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
                         Line line = originalLines.get(i);
                         List<IElement> elements = line.sortedElements();
 
-                        if (!elements.isEmpty() && elements.get(elements.size() - 1) instanceof ITextElement) {
+                        if (!elements.isEmpty() && elements.getLast() instanceof ITextElement) {
                             int lineWidth = (int) line.size().x;
                             int spacerWidth = maxWidth - lineWidth;
 

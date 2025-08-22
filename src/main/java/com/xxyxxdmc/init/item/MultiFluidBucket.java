@@ -2,7 +2,6 @@ package com.xxyxxdmc.init.item;
 
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
-import net.minecraft.component.type.TooltipDisplayComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FlowableFluid;
 import net.minecraft.fluid.Fluid;
@@ -10,7 +9,6 @@ import net.minecraft.fluid.FluidState;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.tooltip.TooltipType;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -31,13 +29,10 @@ import net.minecraft.world.event.GameEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
-import java.util.function.Consumer;
 
 import static com.xxyxxdmc.init.ModDataComponents.*;
 
-@SuppressWarnings("DuplicateExpressions")
 public class MultiFluidBucket extends Item {
-    private static final int GRAY = new Color(168, 168, 168).getRGB();
 
     public MultiFluidBucket(Settings settings) {
         super(settings.maxCount(1));
@@ -154,11 +149,12 @@ public class MultiFluidBucket extends Item {
         int mode = stack.getOrDefault(MODE, 1);
         int spare = stack.getOrDefault(SPARE_CAPACITY, 0);
 
+        boolean option1 = (mode == 4 && spare == 0) || ((fillType == 1 || fillType == 4 || fillType == 5 || fillType == 7) && spare == 0);
         if (blockState.isOf(Blocks.WATER_CAULDRON) && blockState.get(LeveledCauldronBlock.LEVEL) == 3) {
             if (!world.isClient) {
                 player.incrementStat(Stats.USED.getOrCreateStat(this));
                 world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
-                if ((mode == 4 && spare == 0) || ((fillType == 1 || fillType == 4 || fillType == 5 || fillType == 7) && spare == 0)) stack.set(SPARE_CAPACITY, 1);
+                if (option1) stack.set(SPARE_CAPACITY, 1);
                 else stack.set(FILL_TYPE, refreshState(fillType, 1));
             }
             player.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
@@ -173,7 +169,7 @@ public class MultiFluidBucket extends Item {
                 player.incrementStat(Stats.USED.getOrCreateStat(this));
                 player.playSound(SoundEvents.ITEM_BUCKET_FILL, 1.0F, 1.0F);
                 world.emitGameEvent(player, GameEvent.FLUID_PICKUP, pos);
-                if ((mode == 4 && spare == 0) || ((fillType == 1 || fillType == 4 || fillType == 5 || fillType == 7) && spare == 0)) stack.set(SPARE_CAPACITY, 1);
+                if (option1) stack.set(SPARE_CAPACITY, 1);
                 else stack.set(FILL_TYPE, refreshState(fillType, 1));
                 return ActionResult.SUCCESS;
             }
@@ -194,11 +190,12 @@ public class MultiFluidBucket extends Item {
         int mode = stack.getOrDefault(MODE, 1);
         int spare = stack.getOrDefault(SPARE_CAPACITY, 0);
 
+        boolean option2 = (mode == 4 && spare == 0) || ((fillType == 2 || fillType == 4 || fillType == 6 || fillType == 7) && spare == 0);
         if (blockState.isOf(Blocks.LAVA_CAULDRON)) {
             if (!world.isClient) {
                 player.incrementStat(Stats.USED.getOrCreateStat(this));
                 world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
-                if ((mode == 4 && spare == 0) || ((fillType == 2 || fillType == 4 || fillType == 6 || fillType == 7) && spare == 0)) stack.set(SPARE_CAPACITY, 2);
+                if (option2) stack.set(SPARE_CAPACITY, 2);
                 else stack.set(FILL_TYPE, refreshState(fillType, 2));
             }
             player.playSound(SoundEvents.ITEM_BUCKET_FILL_LAVA, 1.0F, 1.0F);
@@ -213,7 +210,7 @@ public class MultiFluidBucket extends Item {
                 player.incrementStat(Stats.USED.getOrCreateStat(this));
                 player.playSound(SoundEvents.ITEM_BUCKET_FILL_LAVA, 1.0F, 1.0F);
                 world.emitGameEvent(player, GameEvent.FLUID_PICKUP, pos);
-                if ((mode == 4 && spare == 0) || ((fillType == 2 || fillType == 4 || fillType == 6 || fillType == 7) && spare == 0)) stack.set(SPARE_CAPACITY, 2);
+                if (option2) stack.set(SPARE_CAPACITY, 2);
                 else stack.set(FILL_TYPE, refreshState(fillType, 2));
                 return ActionResult.SUCCESS;
             }
@@ -233,11 +230,12 @@ public class MultiFluidBucket extends Item {
         int fillType = stack.getOrDefault(FILL_TYPE, 0);
         int mode = stack.getOrDefault(MODE, 1);
         int spare = stack.getOrDefault(SPARE_CAPACITY, 0);
+        boolean option3 = (mode == 4 && spare == 0) || ((fillType == 3 || fillType == 5 || fillType == 6 || fillType == 7) && spare == 0);
         if (blockState.isOf(Blocks.POWDER_SNOW_CAULDRON) && blockState.get(LeveledCauldronBlock.LEVEL) == 3) {
             if (!world.isClient) {
                 player.incrementStat(Stats.USED.getOrCreateStat(this));
                 world.setBlockState(pos, Blocks.CAULDRON.getDefaultState());
-                if ((mode == 4 && spare == 0) || ((fillType == 3 || fillType == 5 || fillType == 6 || fillType == 7) && spare == 0)) stack.set(SPARE_CAPACITY, 3);
+                if (option3) stack.set(SPARE_CAPACITY, 3);
                 else stack.set(FILL_TYPE, refreshState(fillType, 3));
             }
             player.playSound(SoundEvents.ITEM_BUCKET_FILL_POWDER_SNOW, 1.0F, 1.0F);
@@ -249,7 +247,7 @@ public class MultiFluidBucket extends Item {
             world.breakBlock(pos, false);
             player.playSound(SoundEvents.ITEM_BUCKET_FILL_POWDER_SNOW, 1.0F, 1.0F);
             if (!world.isClient) {
-                if ((mode == 4 && spare == 0) || ((fillType == 3 || fillType == 5 || fillType == 6 || fillType == 7) && spare == 0)) stack.set(SPARE_CAPACITY, 3);
+                if (option3) stack.set(SPARE_CAPACITY, 3);
                 else stack.set(FILL_TYPE, refreshState(fillType, 3));
             }
             return ActionResult.SUCCESS;
@@ -417,7 +415,7 @@ public class MultiFluidBucket extends Item {
             return false;
         }
 
-        if (world.getDimension().ultrawarm() && fluid.isIn(FluidTags.WATER)) {
+        if (world.getDimension().ultrawarm() && fluid.getDefaultState().isIn(FluidTags.WATER)) {
             world.playSound(player, pos, SoundEvents.BLOCK_FIRE_EXTINGUISH, SoundCategory.BLOCKS, 0.5F, 2.6F + (world.random.nextFloat() - world.random.nextFloat()) * 0.8F);
             for (int l = 0; l < 8; ++l) {
                 world.addImportantParticleClient(ParticleTypes.LARGE_SMOKE, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 0.0, 0.0, 0.0);
@@ -425,7 +423,7 @@ public class MultiFluidBucket extends Item {
             return true;
         }
 
-        if (!world.isClient && blockState.isReplaceable() && !blockState.isLiquid()) {
+        if (!world.isClient && blockState.isReplaceable() && !blockState.getFluidState().isEmpty()) {
             world.breakBlock(pos, true);
         }
 
@@ -438,54 +436,7 @@ public class MultiFluidBucket extends Item {
     }
 
     protected void playEmptyingSound(@Nullable PlayerEntity user, WorldAccess world, BlockPos pos, Fluid fluid) {
-        world.playSound(user, pos, fluid.isIn(FluidTags.WATER) ? SoundEvents.ITEM_BUCKET_EMPTY : SoundEvents.ITEM_BUCKET_EMPTY_LAVA, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        world.playSound(user, pos, fluid.getDefaultState().isIn(FluidTags.WATER) ? SoundEvents.ITEM_BUCKET_EMPTY : SoundEvents.ITEM_BUCKET_EMPTY_LAVA, SoundCategory.BLOCKS, 1.0F, 1.0F);
         world.emitGameEvent(user, GameEvent.FLUID_PLACE, pos);
-    }
-
-    @Override
-    public void appendTooltip(ItemStack stack, TooltipContext context, TooltipDisplayComponent displayComponent, Consumer<Text> textConsumer, TooltipType type) {
-        super.appendTooltip(stack, context, displayComponent, textConsumer, type);
-        int fillType = stack.getOrDefault(FILL_TYPE, 0);
-        int mode = stack.getOrDefault(MODE, 1);
-        int spare = stack.getOrDefault(SPARE_CAPACITY, 0);
-        textConsumer.accept(Text.translatable("tooltip.hoshikima.state")
-                .append(": ")
-                .append(Text.translatable("tooltip.hoshikima.water")
-                        .withColor((fillType == 1 || fillType == 4 || fillType == 5 || fillType == 7) ?
-                                new Color(0, 116, 216).getRGB() : GRAY))
-                .append("/")
-                .append(Text.translatable("tooltip.hoshikima.lava")
-                        .withColor((fillType == 2 || fillType == 4 || fillType == 6 || fillType == 7) ?
-                                new Color(221, 76, 0).getRGB() : GRAY))
-                .append("/")
-                .append(Text.translatable("tooltip.hoshikima.powder_snow")
-                        .withColor((fillType == 3 || fillType == 5 || fillType == 6 || fillType == 7) ?
-                                new Color(255, 255, 255).getRGB() : GRAY))
-                .append("/")
-                .append(Text.translatable("tooltip.hoshikima.spare")
-                        .withColor(spare == 0 ?
-                                new Color(168, 168, 168).getRGB() : spare == 1 ?
-                                new Color(0, 116, 216).getRGB() : spare == 2 ?
-                                new Color(221, 76, 0).getRGB() :
-                                new Color(255, 255, 255).getRGB())
-                )
-        );
-        textConsumer.accept(Text.translatable("tooltip.hoshikima.mode")
-                .append(": ")
-                .append(Text.translatable("tooltip.hoshikima." + (mode == 1 ? "water" :
-                        (mode == 2 ? "lava" : (mode == 3 ? "powder_snow" : "spare"))))
-                        .withColor((mode == 1 ? new Color(0, 116, 216).getRGB() :
-                                (mode == 2 ? new Color(221, 76, 0).getRGB() :
-                                        (mode == 3 ? new Color(255, 255, 255).getRGB() :
-                                                new Color(168, 168, 168).getRGB()))))
-                        .append((mode != 4) ? "" : "(")
-                        .append((mode != 4) ? Text.empty() : (spare == 0) ?
-                                Text.translatable("tooltip.hoshikima.empty").formatted(Formatting.GRAY) : spare == 1 ?
-                                Text.translatable("tooltip.hoshikima.water").withColor(new Color(0, 116, 216).getRGB()) : spare == 2 ?
-                                Text.translatable("tooltip.hoshikima.lava").withColor(new Color(221, 76, 0).getRGB()) :
-                                Text.translatable("tooltip.hoshikima.powder_snow"))
-                        .append((mode != 4) ? "" : ")")
-                )
-        );
     }
 }
