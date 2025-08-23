@@ -46,7 +46,7 @@ dependencies {
 
 	modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
 
-	modImplementation "maven.modrinth:jade:18.2.0+fabric"
+	modImplementation "maven.modrinth:jade:${project.jade_version}"
 }
 
 processResources {

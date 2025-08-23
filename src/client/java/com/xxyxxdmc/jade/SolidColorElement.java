@@ -2,8 +2,9 @@ package com.xxyxxdmc.jade;
 
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.math.Vec2f;
-import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.ui.Element;
+
+import org.jetbrains.annotations.Nullable;
 
 public class SolidColorElement extends Element {
 
