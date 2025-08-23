@@ -40,3 +40,7 @@ replay_*.log
 *.jfr
 /src/main/generated/.cache/476cfa1df8cc26436c4e179ef197fa2e7f7a09fa
 /src/main/generated/.cache/
+
+# ctags
+
+tags
