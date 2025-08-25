@@ -5,6 +5,8 @@ import com.xxyxxdmc.Hoshikima;
 import com.xxyxxdmc.config.HoshikimaConfig;
 import com.xxyxxdmc.init.api.IChainMineState;
 import com.xxyxxdmc.init.api.ISolidColorElementFactory;
+
+import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -16,11 +18,11 @@ import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.ui.IElement;
-import snownee.jade.api.ui.IElementHelper;
-import snownee.jade.api.ui.ITextElement;
+import snownee.jade.api.ui.IDisplayHelper;
+import snownee.jade.api.ui.TextElement;
 import snownee.jade.impl.Tooltip;
 import snownee.jade.impl.Tooltip.Line;
+import snownee.jade.api.ui.Element;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -40,7 +42,7 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         NbtCompound serverData = accessor.getServerData();
-        IElementHelper helper = IElementHelper.get();
+        IDisplayHelper helper = IDisplayHelper.get();
         ISolidColorElementFactory factory = Hoshikima.solidColorElementFactory;
 
         //⛏🔱🗡🏹❤🔥
@@ -63,7 +65,8 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
             if (!configGlobal.jadeLinkageOverwrite) {
                 int maxWidth = 0;
                 for (Line line : originalLines) {
-                    int line_width = (int) line.size().x;
+                    int line_width = 0;
+                    for (Widget element: line.elements()) line_width+=element.getWidth();
                     if (line_width > maxWidth) {
                         maxWidth = line_width;
                     }
@@ -72,15 +75,16 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
                 for (int i = 0; i < texts.size(); i++) {
                     if (i < originalLines.size()) {
                         Line line = originalLines.get(i);
-                        List<IElement> elements = line.sortedElements();
+                        List<Widget> elements = line.elements();
 
-                        if (!elements.isEmpty() && elements.getLast() instanceof ITextElement) {
-                            int lineWidth = (int) line.size().x;
+                        if (!elements.isEmpty() && elements.getLast() instanceof TextElement) {
+                            int lineWidth = 0;
+                            for (Widget element: elements) lineWidth+=element.getWidth();
                             int spacerWidth = maxWidth - lineWidth;
 
-                            IElement spacer = helper.spacer(spacerWidth + 3, 0);
-                            IElement verticalLine = factory.create(1, 9, Color.GRAY.getRGB());
-                            ITextElement chainText = helper.text(texts.get(i));
+                            Element spacer = helper.blitSprite(, spacerWidth + 3, 0);
+                            Element verticalLine = factory.create(1, 9, Color.GRAY.getRGB());
+                            TextElement chainText = helper.drawText(, null, i, lineWidth, spacerWidth);
 
                             tooltip.append(i, spacer);
                             tooltip.append(i, verticalLine);
@@ -88,9 +92,9 @@ public class ChainMineComponentProvider implements IBlockComponentProvider, ISer
                             tooltip.append(i, chainText);
                         }
                     } else {
-                        IElement spacer = helper.spacer(maxWidth + 3, 0);
-                        IElement verticalLine = factory.create(1, 9, Color.GRAY.getRGB());
-                        ITextElement chainText = helper.text(texts.get(i));
+                        Element spacer = helper.spacer(maxWidth + 3, 0);
+                        Element verticalLine = factory.create(1, 9, Color.GRAY.getRGB());
+                        TextElement chainText = helper.text(texts.get(i));
                         tooltip.append(i, spacer);
                         tooltip.append(i, verticalLine);
                         tooltip.append(i, helper.spacer(3, 0));

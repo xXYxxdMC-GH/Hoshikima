@@ -1,10 +1,8 @@
 package com.xxyxxdmc.jade;
 
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.util.math.Vec2f;
+import net.minecraft.text.Text;
 import snownee.jade.api.ui.Element;
-
-import org.jetbrains.annotations.Nullable;
 
 public class SolidColorElement extends Element {
 
@@ -19,20 +17,12 @@ public class SolidColorElement extends Element {
     }
 
     @Override
-    public Vec2f getSize() {
-        return new Vec2f(this.width, this.height);
+    public Text getNarration() {
+        return Text.of("");
     }
 
     @Override
-    public void render(DrawContext guiGraphics, float x, float y, float maxX, float maxY) {
-        guiGraphics.fill((int) x, (int) y, (int) x + this.width, (int) y + this.height, this.color);
-    }
-
-    public @Nullable String getMessage() {
-        return this.getString();
-    }
-
-    public String getString() {
-        return this.toString();
+    public void render(DrawContext guiGraphics, int x, int y, float maxX) {
+        guiGraphics.fill(x, y, x + this.width, y + this.height, this.color);
     }
 }

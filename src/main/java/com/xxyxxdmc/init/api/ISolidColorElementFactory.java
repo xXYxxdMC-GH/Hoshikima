@@ -1,7 +1,7 @@
 package com.xxyxxdmc.init.api;
 
-import snownee.jade.api.ui.IElement;
+import snownee.jade.api.ui.Element;
 
 public interface ISolidColorElementFactory {
-    IElement create(int width, int height, int color);
+    Element create(int width, int height, int color);
 }
